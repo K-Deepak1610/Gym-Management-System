@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+
+{% block header_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10 overflow-hidden">
+    <!-- Members Card -->
+    <div class="card-titan p-6 group animate-count" style="animation-delay: 0.1s;">
+        <div class="flex justify-between items-start mb-4">
+            <div class="w-12 h-12 rounded-2xl bg-cyan-400/10 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-all duration-500">
+                <i class="fas fa-users text-xl"></i>
+            </div>
+            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Active Base</span>
+        </div>
+        <h3 class="text-3xl font-black text-white tracking-tighter mb-1" id="stat-members">0</h3>
+        <p class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1">
+            <i class="fas fa-caret-up"></i> +12.5% <span class="text-slate-600 font-medium">vs last month</span>
+        </p>
+    </div>
+
+    <!-- Trainers Card -->
+    <div class="card-titan p-6 group animate-count" style="animation-delay: 0.2s;">
+        <div class="flex justify-between items-start mb-4">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-400/10 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-all duration-500">
+                <i class="fas fa-user-tie text-xl"></i>
+            </div>
+            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Expert Staff</span>
+        </div>
+        <h3 class="text-3xl font-black text-white tracking-tighter mb-1" id="stat-trainers">0</h3>
+        <p class="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Global Trainers</p>
+    </div>
+
+    <!-- Revenue Card -->
+    <div class="card-titan p-6 group animate-count" style="animation-delay: 0.3s;">
+        <div class="flex justify-between items-start mb-4">
+            <div class="w-12 h-12 rounded-2xl bg-purple-400/10 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-all duration-500">
+                <i class="fas fa-wallet text-xl"></i>
+            </div>
+            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Revenue (MTD)</span>
+        </div>
+        <h3 class="text-3xl font-black text-white tracking-tighter mb-1">₹<span id="stat-revenue">0</span></h3>
+        <p class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1">
+            <i class="fas fa-caret-up"></i> +8.2% <span class="text-slate-600 font-medium">this week</span>
+        </p>
+    </div>
+
+    <!-- Attendance Card -->
+    <div class="card-titan p-6 group animate-count" style="animation-delay: 0.4s;">
+        <div class="flex justify-between items-start mb-4">
+            <div class="w-12 h-12 rounded-2xl bg-orange-400/10 flex items-center justify-center text-orange-400 group-hover:scale-110 transition-all duration-500">
+                <i class="fas fa-chart-line text-xl"></i>
+            </div>
+            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Engagement</span>
+        </div>
+        <h3 class="text-3xl font-black text-white tracking-tighter mb-1"><span id="stat-attendance">0</span>%</h3>
+        <p class="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-medium">Average Daily</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+    <!-- Business Analytics Chart -->
+    <div class="lg:col-span-2 card-titan p-8">
+        <div class="flex justify-between items-center mb-8">
+            <h3 class="font-bold text-lg">Business Analytics</h3>
+            <div class="flex items-center gap-4 text-[10px]">
+                <div class="flex items-center gap-2 text-cyan-400"><span class="w-2 h-2 rounded-full bg-cyan-400"></span> Growth</div>
+                <div class="flex items-center gap-2 text-emerald-400"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Revenue</div>
+                <div class="flex items-center gap-2 text-purple-400"><span class="w-2 h-2 rounded-full bg-purple-400"></span> Activity</div>
+            </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="businessChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Attendance Today Chart -->
+    <div class="card-titan p-8">
+        <h3 class="font-bold text-lg mb-8">Today's Attendance</h3>
+        <div class="relative h-64 flex items-center justify-center">
+            <canvas id="todayAttendanceChart"></canvas>
+            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span id="att-present-val" class="text-3xl font-black text-cyan-400">0</span>
+                <span class="text-[10px] uppercase font-bold text-slate-500">Present</span>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mt-8">
+            <div class="bg-white/5 p-4 rounded-2xl text-center">
+                <p class="text-[10px] uppercase font-bold text-slate-500 mb-1">Absent</p>
+                <p id="att-absent-val" class="text-lg font-bold text-rose-500">0</p>
+            </div>
+            <div class="bg-white/5 p-4 rounded-2xl text-center">
+                <p class="text-[10px] uppercase font-bold text-slate-500 mb-1">Total</p>
+                <p id="att-total-val" class="text-lg font-bold text-white">0</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+    <!-- Top Members Leaderboard -->
+    <div class="card-titan p-8">
+        <div class="flex justify-between items-center mb-8">
+            <h3 class="font-bold text-lg">Top Active Members</h3>
+            <i class="fas fa-crown text-amber-400"></i>
+        </div>
+        <div id="leaderboard-list" class="space-y-6">
+            <p class="text-sm text-slate-600 animate-pulse">Ranking members...</p>
+        </div>
+    </div>
+
+    <!-- Admin Activity Log -->
+    <div class="card-titan p-8">
+        <h3 class="font-bold text-lg mb-8">System Activity</h3>
+        <div id="activity-log" class="space-y-6">
+            <p class="text-sm text-slate-600 animate-pulse">Monitoring actions...</p>
+        </div>
+    </div>
+
+    <!-- Recent Announcements -->
+    <div class="card-titan p-8 flex flex-col">
+        <h3 class="font-bold text-lg mb-8">Announcements</h3>
+        <div id="announcement-list" class="space-y-6 flex-1 overflow-y-auto pr-2 max-h-[350px]">
+            <p class="text-sm text-slate-600 animate-pulse">Loading updates...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let businessChart = null;
+    let todayChart = null;
+
+    async function initDashboard() {
+        try {
+            const [statsRes, analyticsRes] = await Promise.all([
+                fetch('/dashboard_data'),
+                fetch('/analytics_data')
+            ]);
+
+            const statsData = await statsRes.json();
+            const analyticsData = await analyticsRes.json();
+
+            updateStats(statsData.stats);
+            renderAnnouncements(statsData.announcements);
+            renderLeaderboard(statsData.leaderboard);
+            renderActivityLog(statsData.activities);
+            renderTodayAttendance(statsData.att_split);
+            renderBusinessChart(analyticsData);
+
+        } catch (error) {
+            console.error("Dashboard failed to load:", error);
+        }
+    }
+
+    function updateStats(stats) {
+        document.getElementById('stat-members').setAttribute('data-target', stats.total_members);
+        document.getElementById('stat-trainers').setAttribute('data-target', stats.active_trainers);
+        document.getElementById('stat-revenue').setAttribute('data-target', stats.fee_collected);
+        document.getElementById('stat-attendance').setAttribute('data-target', stats.attendance_rate);
+        animateCounters();
+    }
+
+    function renderLeaderboard(members) {
+        const container = document.getElementById('leaderboard-list');
+        container.innerHTML = '';
+        members.forEach((m, i) => {
+            const item = document.createElement('div');
+            item.className = 'flex items-center justify-between p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-all';
+            item.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <span class="text-xs font-black text-slate-500">#${i + 1}</span>
+                    <span class="text-sm font-bold text-slate-200">${m.name}</span>
+                </div>
+                <div class="text-xs font-bold text-cyan-400 bg-cyan-400/10 px-3 py-1 rounded-full">${m.visits} Visits</div>
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    function renderActivityLog(activities) {
+        const container = document.getElementById('activity-log');
+        container.innerHTML = '';
+        activities.forEach(a => {
+            const item = document.createElement('div');
+            item.className = 'flex items-start gap-4';
+            item.innerHTML = `
+                <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5"></div>
+                <div>
+                    <p class="text-xs font-medium text-slate-300">${a.action}</p>
+                    <span class="text-[9px] uppercase tracking-widest text-slate-600">${a.time}</span>
+                </div>
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    function renderAnnouncements(ann) {
+        const container = document.getElementById('announcement-list');
+        container.innerHTML = '';
+        
+        if (ann.length === 0) {
+            container.innerHTML = `<p class="text-xs font-bold text-slate-600 uppercase tracking-widest text-center mt-10">No announcements today</p>`;
+            return;
+        }
+
+        ann.forEach(a => {
+            const item = document.createElement('div');
+            item.className = 'mb-6 pb-6 border-b border-white/5 last:border-0 relative pl-6';
+            
+            // Colored indicator logic
+            let indicatorColor = 'var(--accent-cyan)';
+            if (a.title.toLowerCase().includes('expired')) indicatorColor = 'var(--accent-rose)';
+            else if (a.title.toLowerCase().includes('expires')) indicatorColor = 'var(--accent-orange)';
+            
+            item.innerHTML = `
+                <div class="absolute left-0 top-1 w-1.5 h-full rounded-full opacity-50" style="background: ${indicatorColor}"></div>
+                <h4 class="text-sm font-bold text-slate-200 mb-1">${a.title}</h4>
+                <p class="text-xs text-slate-500 leading-relaxed">${a.content}</p>
+                <p class="text-[9px] text-slate-600 uppercase mt-3 tracking-widest font-black">${a.time}</p>
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    function renderTodayAttendance(split) {
+        const ctx = document.getElementById('todayAttendanceChart').getContext('2d');
+        const total = split.present + split.absent;
+        document.getElementById('att-present-val').innerText = split.present;
+        document.getElementById('att-absent-val').innerText = split.absent;
+        document.getElementById('att-total-val').innerText = total;
+
+        if (todayChart) todayChart.destroy();
+        todayChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [split.present, split.absent || (total === 0 ? 1 : 0)],
+                    backgroundColor: ['#22d3ee', total === 0 ? 'rgba(255,255,255,0.05)' : '#f43f5e'],
+                    borderWidth: 0,
+                    cutout: '85%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    function renderBusinessChart(data) {
+        const ctx = document.getElementById('businessChart').getContext('2d');
+        if (businessChart) businessChart.destroy();
+
+        businessChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.months,
+                datasets: [
+                    { label: 'Growth', data: data.member_growth, backgroundColor: '#22d3ee', borderRadius: 6, barThickness: 12 },
+                    { label: 'Revenue', data: data.revenue.map(r => r / 100), backgroundColor: '#4ade80', borderRadius: 6, barThickness: 12 },
+                    { label: 'Activity', data: data.attendance, backgroundColor: '#a855f7', borderRadius: 6, barThickness: 12 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } },
+                    y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748b', font: { size: 10 } } }
+                }
+            }
+        });
+    }
+
+    function animateCounters() {
+        const counters = [
+            { id: 'stat-members', prefix: '', suffix: '' },
+            { id: 'stat-trainers', prefix: '', suffix: '' },
+            { id: 'stat-revenue', prefix: '', suffix: '' },
+            { id: 'stat-attendance', prefix: '', suffix: '' }
+        ];
+
+        counters.forEach(counter => {
+            const el = document.getElementById(counter.id);
+            const target = parseFloat(el.getAttribute('data-target'));
+            if (isNaN(target)) return;
+
+            const duration = 1500;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const currentVal = (progress * target);
+                
+                if (counter.id === 'stat-revenue') {
+                    el.innerText = currentVal.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+                } else {
+                    el.innerText = Math.floor(currentVal);
+                }
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initDashboard);
+</script>
+{% endblock %}

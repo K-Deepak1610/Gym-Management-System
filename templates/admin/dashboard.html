@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Neon Gym{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="flex justify-between items-center mb-10">
+        <div>
+            <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500">Admin Dashboard</h1>
+            <p class="text-gray-400 mt-2">Welcome back, Admin. Here's what's happening today.</p>
+        </div>
+        <div class="flex gap-4">
+            <button class="px-6 py-3 glass-card rounded-xl hover:bg-white/10 transition-all">
+                <i class="fas fa-download mr-2"></i> Report
+            </button>
+            <button class="px-6 py-3 btn-primary rounded-xl text-white font-semibold">
+                <i class="fas fa-plus mr-2"></i> Add Member
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div class="glass-card p-6 rounded-3xl border-l-4 border-cyan-400">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-gray-400 text-sm mb-1">Total Members</p>
+                    <h3 class="text-3xl font-bold">1,284</h3>
+                </div>
+                <div class="w-12 h-12 bg-cyan-400/10 rounded-2xl flex items-center justify-center text-cyan-400">
+                    <i class="fas fa-users text-xl"></i>
+                </div>
+            </div>
+            <p class="text-xs text-emerald-400 mt-4"><i class="fas fa-arrow-up mr-1"></i> 12% from last month</p>
+        </div>
+
+        <div class="glass-card p-6 rounded-3xl border-l-4 border-purple-400">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-gray-400 text-sm mb-1">Active Trainers</p>
+                    <h3 class="text-3xl font-bold">24</h3>
+                </div>
+                <div class="w-12 h-12 bg-purple-400/10 rounded-2xl flex items-center justify-center text-purple-400">
+                    <i class="fas fa-user-tie text-xl"></i>
+                </div>
+            </div>
+            <p class="text-xs text-gray-400 mt-4">Full capacity reached</p>
+        </div>
+
+        <div class="glass-card p-6 rounded-3xl border-l-4 border-emerald-400">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-gray-400 text-sm mb-1">Monthly Revenue</p>
+                    <h3 class="text-3xl font-bold">$12,450</h3>
+                </div>
+                <div class="w-12 h-12 bg-emerald-400/10 rounded-2xl flex items-center justify-center text-emerald-400">
+                    <i class="fas fa-dollar-sign text-xl"></i>
+                </div>
+            </div>
+            <p class="text-xs text-emerald-400 mt-4"><i class="fas fa-arrow-up mr-1"></i> 8.4% growth</p>
+        </div>
+
+        <div class="glass-card p-6 rounded-3xl border-l-4 border-orange-400">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-gray-400 text-sm mb-1">Attendance Rate</p>
+                    <h3 class="text-3xl font-bold">88%</h3>
+                </div>
+                <div class="w-12 h-12 bg-orange-400/10 rounded-2xl flex items-center justify-center text-orange-400">
+                    <i class="fas fa-calendar-check text-xl"></i>
+                </div>
+            </div>
+            <p class="text-xs text-rose-400 mt-4"><i class="fas fa-arrow-down mr-1"></i> 2% from yesterday</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Analytics Chart -->
+        <div class="lg:col-span-2 glass-card p-8 rounded-3xl">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-xl font-bold">Member Acquisition</h3>
+                <select class="bg-white/5 border border-white/10 rounded-lg px-3 py-1 text-sm outline-none">
+                    <option>Last 6 Months</option>
+                    <option>Last Year</option>
+                </select>
+            </div>
+            <canvas id="revenueChart" height="250"></canvas>
+        </div>
+
+        <!-- Recent Announcements -->
+        <div class="glass-card p-8 rounded-3xl">
+            <h3 class="text-xl font-bold mb-6">Announcements</h3>
+            <div class="space-y-6">
+                <div class="flex gap-4 p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-all cursor-pointer border border-transparent hover:border-white/10">
+                    <div class="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 shrink-0">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-sm">New Yoga Batch</h4>
+                        <p class="text-xs text-gray-400 mt-1">Starting from Monday at 6 AM.</p>
+                        <span class="text-[10px] text-gray-500 mt-2 block">2 hours ago</span>
+                    </div>
+                </div>
+                <div class="flex gap-4 p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-all cursor-pointer border border-transparent hover:border-white/10">
+                    <div class="w-10 h-10 bg-rose-500/20 rounded-xl flex items-center justify-center text-rose-400 shrink-0">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-sm">Maintenance Notice</h4>
+                        <p class="text-xs text-gray-400 mt-1">Pool area closed for cleaning.</p>
+                        <span class="text-[10px] text-gray-500 mt-2 block">Yesterday</span>
+                    </div>
+                </div>
+            </div>
+            <button class="w-full mt-6 py-3 border border-white/10 rounded-xl text-sm font-medium hover:bg-white/5 transition-all">View All</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'New Members',
+                data: [65, 59, 80, 81, 56, 95],
+                borderColor: '#4ecdc4',
+                backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#4ecdc4',
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: { color: '#888' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#888' }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

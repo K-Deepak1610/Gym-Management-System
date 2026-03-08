@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block header_title %}Equipment Inventory{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-8 animate-slide">
+    <div class="relative w-96">
+        <i class="fas fa-search absolute left-4 top-3.5 text-slate-500 text-sm"></i>
+        <input type="text" placeholder="Search equipment..." class="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/5 rounded-2xl outline-none focus:border-cyan-400/30 transition-all text-sm backdrop-blur-sm">
+    </div>
+    <button onclick="toggleModal('addEquipmentModal')" class="btn-titan px-8 py-3 flex items-center gap-2 font-bold uppercase tracking-widest text-xs">
+        <i class="fas fa-plus"></i> Add Equipment
+    </button>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide" style="animation-delay: 0.1s;">
+    {% for item in items %}
+    <div class="card-titan p-8 flex flex-col justify-between group hover:border-cyan-400/30 transition-all">
+        <div>
+            <div class="flex justify-between items-start mb-6">
+                <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-cyan-400 transition-colors">
+                    <i class="fas fa-dumbbell text-xl"></i>
+                </div>
+                <span class="px-3 py-1 bg-emerald-400/10 text-emerald-400 text-[10px] font-black uppercase rounded-lg border border-emerald-400/20">
+                    {{ item.gym_condition }}
+                </span>
+            </div>
+            <h3 class="text-xl font-black text-white uppercase tracking-tighter mb-2">{{ item.name }}</h3>
+            <div class="flex items-center gap-3 text-xs text-slate-500 font-bold uppercase mb-6">
+                <span>Quantity: <span class="text-white">{{ item.quantity }}</span></span>
+                <span class="w-1 h-1 rounded-full bg-slate-700"></span>
+                <span>Active</span>
+            </div>
+        </div>
+        
+        <div class="pt-6 border-t border-white/5">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-[9px] text-slate-600 uppercase font-black tracking-widest mb-1">Last Maintenance</p>
+                    <p class="text-xs font-bold text-slate-300">{{ item.last_maintenance or 'N/A' }}</p>
+                </div>
+                <button class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-slate-500 hover:text-cyan-400 transition-all">
+                    <i class="fas fa-tools"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-span-full py-24 flex flex-col items-center opacity-20">
+        <i class="fas fa-boxes text-5xl mb-4"></i>
+        <p class="text-sm italic font-medium">Inventory is empty. Register your gym assets.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Add Equipment Modal -->
+<div id="addEquipmentModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+    <div class="card-titan w-full max-w-lg p-10 animate-slide border border-white/10">
+        <div class="flex justify-between items-center mb-8">
+            <h3 class="text-2xl font-black text-white uppercase tracking-tighter">New Asset</h3>
+            <button onclick="toggleModal('addEquipmentModal')" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-500 hover:text-white transition-all"><i class="fas fa-times"></i></button>
+        </div>
+        <form action="/add_equipment" method="POST" class="space-y-6">
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Equipment Name</label>
+                <input type="text" name="name" required class="w-full bg-slate-900/50 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-cyan-400/40 transition-all text-sm">
+            </div>
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Quantity</label>
+                    <input type="number" name="quantity" value="1" required class="w-full bg-slate-900/50 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-cyan-400/40 transition-all text-sm">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Condition</label>
+                    <select name="condition" class="w-full bg-slate-900/50 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-cyan-400/40 transition-all text-sm appearance-none font-bold text-slate-300 uppercase cursor-pointer">
+                        <option>Excellent</option>
+                        <option>Good</option>
+                        <option>Fair</option>
+                        <option>Repair Required</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Last Maintenance Date</label>
+                <input type="date" name="last_maintenance" required class="w-full bg-slate-900/50 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-cyan-400/40 transition-all text-sm [color-scheme:dark]">
+            </div>
+            <button type="submit" class="w-full btn-titan py-4 mt-4 font-black uppercase tracking-[0.2em] text-xs">Register Equipment</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleModal(id) {
+        document.getElementById(id).classList.toggle('hidden');
+    }
+</script>
+{% endblock %}

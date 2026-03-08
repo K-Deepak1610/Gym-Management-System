@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block header_title %}Member Profile{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <a href="/members" class="text-xs font-bold text-slate-500 hover:text-cyan-400 uppercase tracking-widest flex items-center gap-2 transition-colors">
+        <i class="fas fa-arrow-left"></i> Back to Directory
+    </a>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-slide">
+    <!-- Profile Card -->
+    <div class="card-titan p-10 flex flex-col items-center border-t-4 border-cyan-400">
+        <div class="w-32 h-32 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white text-5xl font-black mb-6 shadow-2xl shadow-cyan-400/20">
+            {{ member.name[:2].upper() }}
+        </div>
+        <h3 class="text-2xl font-black text-white uppercase tracking-tighter">{{ member.name }}</h3>
+        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">ID: TF-{{ "%04d" % member.id }}</p>
+        
+        <div class="mt-8 w-full space-y-4">
+            <div class="flex justify-between items-center p-4 bg-white/5 rounded-2xl border border-white/5">
+                <span class="text-[10px] uppercase font-bold text-slate-500">Status</span>
+                <span class="status-badge status-{{ member.status|lower|replace(' ', '-') }}">{{ member.status }}</span>
+            </div>
+            <div class="flex justify-between items-center p-4 bg-white/5 rounded-2xl border border-white/5">
+                <span class="text-[10px] uppercase font-bold text-slate-500">Tier</span>
+                <span class="plan-badge">{{ member.membership_plan }}</span>
+            </div>
+            <div class="flex justify-between items-center p-4 bg-white/5 rounded-2xl border border-white/5">
+                <span class="text-[10px] uppercase font-bold text-slate-500">Personal Trainer</span>
+                <span class="text-xs font-bold text-emerald-400">{{ member.trainer_name or 'Independent' }}</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mt-8 w-full">
+            <div class="bg-white/5 p-4 rounded-2xl text-center">
+                <p class="text-[10px] uppercase font-bold text-slate-500 mb-1">Joined</p>
+                <p class="text-xs font-bold text-white">{{ member.join_date }}</p>
+            </div>
+            <div class="bg-white/5 p-4 rounded-2xl text-center">
+                <p class="text-[10px] uppercase font-bold text-slate-500 mb-1">Expires</p>
+                <p class="text-xs font-bold text-rose-500">{{ member.expiry_date }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Tabs -->
+    <div class="lg:col-span-2 space-y-8">
+        <!-- Attendance History -->
+        <div class="card-titan p-8">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="font-bold text-lg">Activity History</h3>
+                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Last 30 Check-ins</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                {% for att in attendance %}
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-[10px] font-black {% if att.status == 'Present' %}bg-emerald-400/10 text-emerald-400 border border-emerald-400/20{% else %}bg-rose-400/10 text-rose-400 border border-rose-400/20{% endif %}" 
+                     title="{{ att.attendance_date }}">
+                    {{ att.attendance_date.strftime('%d') }}
+                </div>
+                {% else %}
+                <p class="text-sm text-slate-600 italic">No activity recorded yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Payment History -->
+        <div class="card-titan p-8">
+            <h3 class="font-bold text-lg mb-8">Transaction Ledger</h3>
+            <div class="overflow-hidden">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-[10px] uppercase tracking-widest text-slate-600 font-bold border-b border-white/5">
+                            <th class="pb-4">Date</th>
+                            <th class="pb-4">Description</th>
+                            <th class="pb-4">Method</th>
+                            <th class="pb-4 text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        {% for p in payments %}
+                        <tr>
+                            <td class="py-4 text-xs font-medium text-slate-400">{{ p.payment_date.strftime('%d %b, %Y') }}</td>
+                            <td class="py-4 text-xs font-bold text-slate-200">{{ p.notes or 'Monthly Payment' }}</td>
+                            <td class="py-4 text-[10px] font-black uppercase text-slate-500 tracking-tighter">{{ p.payment_method }}</td>
+                            <td class="py-4 text-right text-sm font-black text-emerald-400">₹{{ "{:,.2f}".format(p.amount) }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="py-10 text-center opacity-30 italic text-sm">No transactions found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

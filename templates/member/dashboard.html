@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Member Dashboard - Neon Gym{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="flex justify-between items-center mb-10">
+        <div>
+            <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500">My Fitness Hub</h1>
+            <p class="text-gray-400 mt-2">Push your limits today, {{ user.username }}.</p>
+        </div>
+        <div class="flex items-center gap-4 p-4 glass-card rounded-2xl">
+            <div class="text-right">
+                <p class="text-xs text-gray-400">Membership Status</p>
+                <p class="text-sm font-bold text-emerald-400">ACTIVE</p>
+            </div>
+            <div class="w-10 h-10 bg-emerald-400/10 rounded-full flex items-center justify-center text-emerald-400">
+                <i class="fas fa-check-circle"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Progress Track -->
+        <div class="lg:col-span-2 space-y-8">
+            <div class="glass-card p-8 rounded-3xl">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-xl font-bold">Weight Progress</h3>
+                    <div class="flex gap-2">
+                        <span class="px-3 py-1 bg-cyan-400/10 text-cyan-400 rounded-lg text-xs font-bold">Current: 78kg</span>
+                        <span class="px-3 py-1 bg-white/5 text-gray-400 rounded-lg text-xs">Goal: 72kg</span>
+                    </div>
+                </div>
+                <canvas id="fitnessChart" height="200"></canvas>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- AI Workout Suggestion -->
+                <div class="glass-card p-6 rounded-3xl bg-gradient-to-br from-[#4ecdc40d] to-transparent border border-[#4ecdc433]">
+                    <div class="flex items-center gap-3 mb-4">
+                        <i class="fas fa-robot text-cyan-400"></i>
+                        <h3 class="font-bold">AI Workout of the Day</h3>
+                    </div>
+                    <p class="text-sm text-gray-300 leading-relaxed mb-4">Based on your "Weight Loss" goal, we suggest:</p>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3 text-sm">
+                            <span class="w-2 h-2 bg-cyan-400 rounded-full"></span>
+                            30 mins high-intensity treadmill
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <span class="w-2 h-2 bg-cyan-400 rounded-full"></span>
+                            4 sets of kettlebell swings
+                        </li>
+                        <li class="flex items-center gap-3 text-sm">
+                            <span class="w-2 h-2 bg-cyan-400 rounded-full"></span>
+                            15 mins dynamic stretching
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Membership Plan -->
+                <div class="glass-card p-6 rounded-3xl bg-gradient-to-br from-[#a855f70d] to-transparent border border-[#a855f733]">
+                    <div class="flex items-center gap-3 mb-4">
+                        <i class="fas fa-crown text-purple-400"></i>
+                        <h3 class="font-bold">Active Plan</h3>
+                    </div>
+                    <div class="mb-6">
+                        <h4 class="text-2xl font-black text-purple-400">PLATINUM</h4>
+                        <p class="text-xs text-gray-400">Yearly Membership</p>
+                    </div>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex justify-between text-xs">
+                            <span class="text-gray-400">Expires in</span>
+                            <span class="text-white">142 Days</span>
+                        </div>
+                        <div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-purple-500 h-full w-[65%]"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Components -->
+        <div class="space-y-8">
+            <!-- QR Access Card -->
+            <div class="glass-card p-8 rounded-3xl text-center">
+                <h3 class="text-xl font-bold mb-6">Daily Pass</h3>
+                <div class="bg-white p-4 rounded-2xl inline-block mx-auto mb-6 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                    <!-- Dummy QR Code Illustration -->
+                    <div class="w-32 h-32 bg-gray-100 flex items-center justify-center p-2">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=GYM-{{ user.id }}" alt="QR Access">
+                    </div>
+                </div>
+                <p class="text-sm text-gray-400 mb-6">Scan this QR at the entrance to mark attendance automatically.</p>
+                <div class="space-y-3">
+                    <div class="flex justify-between text-xs p-3 bg-white/5 rounded-xl">
+                        <span class="text-gray-500">Last Entrance</span>
+                        <span class="text-gray-300">Today, 09:12 AM</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fitness Vitals -->
+            <div class="glass-card p-6 rounded-3xl">
+                <h3 class="font-bold mb-6">Vitals</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white/5 p-4 rounded-2xl text-center">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">BMI</p>
+                        <p class="text-xl font-bold text-cyan-400">22.4</p>
+                    </div>
+                    <div class="bg-white/5 p-4 rounded-2xl text-center">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Height</p>
+                        <p class="text-xl font-bold text-purple-400">178 cm</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const ctx = document.getElementById('fitnessChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+            datasets: [{
+                label: 'Weight (kg)',
+                data: [82, 81.5, 80.2, 79.8, 79.1, 78.5],
+                backgroundColor: 'rgba(78, 205, 196, 0.4)',
+                borderColor: '#4ecdc4',
+                borderWidth: 2,
+                borderRadius: 8,
+                hoverBackgroundColor: '#4ecdc4'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: { color: '#888' },
+                    beginAtZero: false,
+                    min: 70
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#888' }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

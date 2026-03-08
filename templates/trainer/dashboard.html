@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Trainer Dashboard - Neon Gym{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="flex justify-between items-center mb-10">
+        <div>
+            <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500">Trainer Dashboard</h1>
+            <p class="text-gray-400 mt-2">Coach, you have 12 members to guide today.</p>
+        </div>
+        <div class="flex gap-4">
+            <button class="px-6 py-3 glass-card rounded-xl hover:bg-white/10 transition-all font-semibold text-cyan-400">
+                <i class="fas fa-clock mr-2"></i> Attendance Log
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- Trainer Stats -->
+        <div class="lg:col-span-1 space-y-6">
+            <div class="glass-card p-6 rounded-3xl text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4 neon-glow">
+                    <i class="fas fa-user-ninja text-2xl text-white"></i>
+                </div>
+                <h3 class="font-bold text-lg">{{ user.username }}</h3>
+                <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Crossfit Expert</p>
+                <div class="mt-6 pt-6 border-t border-white/5 grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-xl font-bold text-white">12</p>
+                        <p class="text-[10px] text-gray-500 uppercase">Assigned</p>
+                    </div>
+                    <div>
+                        <p class="text-xl font-bold text-emerald-400">4.9</p>
+                        <p class="text-[10px] text-gray-500 uppercase">Rating</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card p-6 rounded-3xl">
+                <h4 class="font-bold mb-4 text-sm">Today's Schedule</h4>
+                <div class="space-y-4">
+                    <div class="p-4 bg-white/5 rounded-2xl border-l-2 border-cyan-400">
+                        <p class="text-xs text-cyan-400 font-bold">09:00 AM</p>
+                        <p class="text-sm font-semibold mt-1">John Doe - Chest Day</p>
+                    </div>
+                    <div class="p-4 bg-white/5 rounded-2xl border-l-2 border-purple-400">
+                        <p class="text-xs text-purple-400 font-bold">11:30 AM</p>
+                        <p class="text-sm font-semibold mt-1">Sarah Wilson - Cardio</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Member Management List -->
+        <div class="lg:col-span-3">
+            <div class="glass-card rounded-3xl overflow-hidden">
+                <div class="p-8 border-b border-white/5 flex justify-between items-center">
+                    <h3 class="text-xl font-bold">Assigned Members</h3>
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-4 top-3.5 text-gray-500 text-sm"></i>
+                        <input type="text" placeholder="Search members..." class="pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm outline-none focus:border-cyan-400 transition-all">
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-white/5 text-[10px] uppercase tracking-widest text-gray-500">
+                            <tr>
+                                <th class="px-8 py-4">Member</th>
+                                <th class="px-8 py-4">Goal</th>
+                                <th class="px-8 py-4">Progress</th>
+                                <th class="px-8 py-4">Last Visit</th>
+                                <th class="px-8 py-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+                            <tr class="hover:bg-white/5 transition-colors group">
+                                <td class="px-8 py-5">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center font-bold text-xs">JD</div>
+                                        <div>
+                                            <p class="text-sm font-semibold">John Doe</p>
+                                            <p class="text-xs text-gray-500">Joining: Jan 2024</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-5">
+                                    <span class="px-3 py-1 bg-cyan-400/10 text-cyan-400 rounded-lg text-[10px] font-bold">BULKING</span>
+                                </td>
+                                <td class="px-8 py-5">
+                                    <div class="w-24 bg-white/10 h-1.5 rounded-full overflow-hidden">
+                                        <div class="bg-emerald-500 h-full w-[75%]"></div>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-5 text-sm">Today, 09:15 AM</td>
+                                <td class="px-8 py-5 text-right">
+                                    <button class="text-gray-400 hover:text-white transition-colors"><i class="fas fa-edit"></i></button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-white/5 transition-colors group">
+                                <td class="px-8 py-5">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center font-bold text-xs">SW</div>
+                                        <div>
+                                            <p class="text-sm font-semibold">Sarah Wilson</p>
+                                            <p class="text-xs text-gray-500">Joining: Feb 2024</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-5">
+                                    <span class="px-3 py-1 bg-orange-400/10 text-orange-400 rounded-lg text-[10px] font-bold">FAT LOSS</span>
+                                </td>
+                                <td class="px-8 py-5">
+                                    <div class="w-24 bg-white/10 h-1.5 rounded-full overflow-hidden">
+                                        <div class="bg-emerald-500 h-full w-[45%]"></div>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-5 text-sm">Yesterday</td>
+                                <td class="px-8 py-5 text-right">
+                                    <button class="text-gray-400 hover:text-white transition-colors"><i class="fas fa-edit"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Members - Neon Gym{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold">Member Management</h1>
+            <p class="text-gray-400 mt-1">Total Members: {{ members|length }}</p>
+        </div>
+        <button class="px-6 py-3 btn-primary rounded-xl text-white font-semibold">
+            <i class="fas fa-plus mr-2"></i> Register New
+        </button>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="glass-card p-4 rounded-2xl mb-8 flex flex-wrap gap-4 items-center">
+        <div class="relative flex-1 min-w-[300px]">
+            <i class="fas fa-search absolute left-4 top-3.5 text-gray-500"></i>
+            <input type="text" placeholder="Search by name, email or phone..." class="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl outline-none focus:border-cyan-400">
+        </div>
+        <select class="px-4 py-3 bg-white/5 border border-white/10 rounded-xl outline-none text-gray-300">
+            <option>All Status</option>
+            <option>Active</option>
+            <option>Expired</option>
+        </select>
+        <button class="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-gray-300 hover:bg-white/10">Filter</button>
+    </div>
+
+    <!-- Members Table -->
+    <div class="glass-card rounded-3xl overflow-hidden shadow-2xl">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-white/5 text-[10px] uppercase tracking-widest text-gray-400">
+                    <tr>
+                        <th class="px-8 py-4">S.No</th>
+                        <th class="px-8 py-4">Full Name</th>
+                        <th class="px-8 py-4">Plan</th>
+                        <th class="px-8 py-4">Joining Date</th>
+                        <th class="px-8 py-4">Status</th>
+                        <th class="px-8 py-4 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    {% for member in members %}
+                    <tr class="hover:bg-white/5 transition-colors group">
+                        <td class="px-8 py-5 text-gray-500 text-sm">{{ loop.index }}</td>
+                        <td class="px-8 py-5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center font-bold text-xs">{{ member.full_name[:2].upper() }}</div>
+                                <div>
+                                    <p class="text-sm font-semibold">{{ member.full_name }}</p>
+                                    <p class="text-[10px] text-gray-500">{{ member.email }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-8 py-5">
+                            <span class="px-2 py-0.5 bg-purple-400/10 text-purple-400 rounded-md text-[10px] font-bold">PREMIUM</span>
+                        </td>
+                        <td class="px-8 py-5 text-sm">{{ member.joining_date }}</td>
+                        <td class="px-8 py-5">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                                <span class="text-xs text-emerald-400 font-medium">Active</span>
+                            </div>
+                        </td>
+                        <td class="px-8 py-5 text-right space-x-2">
+                            <button title="Edit" class="p-2 text-gray-400 hover:text-cyan-400 hover:bg-cyan-400/10 rounded-lg transition-all"><i class="fas fa-edit"></i></button>
+                            <button title="Delete" class="p-2 text-gray-400 hover:text-rose-400 hover:bg-rose-400/10 rounded-lg transition-all"><i class="fas fa-trash-alt"></i></button>
+                            <button title="View Details" class="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"><i class="fas fa-external-link-alt"></i></button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="px-8 py-20 text-center">
+                            <div class="flex flex-col items-center opacity-30">
+                                <i class="fas fa-users-slash text-6xl mb-4"></i>
+                                <p class="text-xl">No members found</p>
+                                <p class="text-sm">Start by adding your first gym member</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="p-6 bg-white/5 border-t border-white/5 flex justify-between items-center text-xs text-gray-500">
+            <p>Showing {{ members|length }} of {{ members|length }} entries</p>
+            <div class="flex gap-2">
+                <button class="px-3 py-1 bg-white/5 rounded-md hover:bg-white/10">Previous</button>
+                <button class="px-3 py-1 bg-[#4ecdc4] text-white rounded-md">1</button>
+                <button class="px-3 py-1 bg-white/5 rounded-md hover:bg-white/10">Next</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

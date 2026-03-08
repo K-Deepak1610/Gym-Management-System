@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block header_title %}Announcement Panel{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-8 animate-slide">
+    <p class="text-slate-500 text-sm">Post updates and news for the gym community.</p>
+    <button onclick="document.getElementById('addAnnModal').classList.remove('hidden')" class="btn-titan px-8 py-3 flex items-center gap-2">
+        <i class="fas fa-bullhorn"></i> New Announcement
+    </button>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 animate-slide">
+    {% for ann in announcements %}
+    <div class="card-titan p-8 border-l-4 border-cyan-400">
+        <div class="flex justify-between items-start mb-4">
+            <h3 class="text-lg font-bold text-white">{{ ann.title }}</h3>
+            <span class="text-[10px] font-medium text-slate-500 uppercase tracking-widest">{{ ann.created_at.strftime('%B %d, %Y') }}</span>
+        </div>
+        <p class="text-sm text-slate-400 leading-relaxed mb-6">{{ ann.content }}</p>
+        <div class="flex justify-between items-center pt-6 border-t border-white/5">
+            <span class="text-[10px] text-slate-600">ID: TITAN-ANN-{{ ann.id }}</span>
+            <div class="flex gap-2">
+                <button class="p-2 text-slate-600 hover:text-white transition-colors"><i class="fas fa-edit"></i></button>
+                <button class="p-2 text-slate-600 hover:text-rose-500 transition-colors"><i class="fas fa-trash-alt"></i></button>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-span-full py-20 text-center opacity-30 italic">No announcements posted.</div>
+    {% endfor %}
+</div>
+
+<!-- Add Announcement Modal -->
+<div id="addAnnModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="card-titan w-full max-w-lg p-10 animate-slide">
+        <div class="flex justify-between items-center mb-8">
+            <h3 class="text-2xl font-bold text-white">New Announcement</h3>
+            <button onclick="document.getElementById('addAnnModal').classList.add('hidden')" class="text-slate-500 hover:text-white"><i class="fas fa-times"></i></button>
+        </div>
+        <form action="/add_announcement" method="POST" class="space-y-6">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Subject / Title</label>
+                <input type="text" name="title" required class="w-full bg-slate-800 border border-white/5 rounded-xl px-4 py-3 outline-none focus:border-cyan-400/50 transition-all text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Message Content</label>
+                <textarea name="content" rows="5" required class="w-full bg-slate-800 border border-white/5 rounded-xl px-4 py-3 outline-none focus:border-cyan-400/50 transition-all text-sm" placeholder="Provide details about the update..."></textarea>
+            </div>
+            <button type="submit" class="w-full btn-titan py-4 mt-6 uppercase tracking-widest">Post Announcement</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block header_title %}Daily Attendance Log{% endblock %}
+
+{% block content %}
+<div class="card-titan p-8 animate-slide">
+    <div class="flex justify-between items-center mb-10">
+        <div>
+            <h3 class="text-xl font-bold text-white">Member Check-in</h3>
+            <p class="text-sm text-slate-500 mt-1">Marking attendance for: <span class="text-cyan-400 font-bold uppercase tracking-widest">{{ today.strftime('%A, %d %B %Y') }}</span></p>
+        </div>
+        <div class="flex gap-4">
+            <button id="submitAttendance" class="btn-titan border-emerald-400 from-emerald-400 to-teal-600 px-10 py-3 flex items-center gap-2 font-bold uppercase tracking-widest">
+                <i class="fas fa-check-double"></i> Submit Attendance
+            </button>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="bg-white/5 text-[10px] uppercase tracking-[0.2em] text-slate-500">
+                    <th class="px-8 py-5">Full Name</th>
+                    <th class="px-8 py-5">Membership Plan</th>
+                    <th class="px-8 py-5 text-center">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5">
+                {% for member in members %}
+                <tr class="table-row-hover">
+                    <td class="px-8 py-6 font-bold text-slate-200">{{ member.name }}</td>
+                    <td class="px-8 py-6">
+                        <span class="plan-badge">{{ member.membership_plan }}</span>
+                    </td>
+                    <td class="px-8 py-6 flex justify-center">
+                        <label class="toggle-switch">
+                            <input type="checkbox" class="attendance-checkbox" data-id="{{ member.id }}">
+                            <span class="slider">
+                                <span class="text-present">PRESENT</span>
+                                <span class="text-absent">ABSENT</span>
+                            </span>
+                        </label>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" class="px-8 py-20 text-center opacity-30 italic">No members found. Please add members first.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    document.getElementById('submitAttendance').addEventListener('click', async function() {
+        const rows = document.querySelectorAll('.attendance-checkbox');
+        const attendanceData = [];
+
+        rows.forEach(cb => {
+            attendanceData.push({
+                member_id: cb.dataset.id,
+                status: cb.checked ? 'Present' : 'Absent'
+            });
+        });
+
+        try {
+            const response = await fetch('/submit_attendance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ attendance: attendanceData })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                alert("Attendance saved successfully for today!");
+            }
+        } catch (error) {
+            console.error("Error submitting attendance:", error);
+            alert("Failed to submit attendance. Check console.");
+        }
+    });
+</script>
+{% endblock %}
