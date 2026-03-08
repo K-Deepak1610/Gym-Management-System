@@ -46,7 +46,7 @@ This project is optimized for deployment on **Render**:
    python backend/app.py
    ```
 4. **Access in Browser**:
-   [http://127.0.0.1:10000](http://127.0.0.1:10000)
+   [https://gym-management-system-49m9.onrender.com](https://gym-management-system-49m9.onrender.com)
 
 *Note: The system automatically creates `database/gym.db` and initializes the schema on first run.*
 
