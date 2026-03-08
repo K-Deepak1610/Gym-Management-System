@@ -15,7 +15,7 @@ app.secret_key = 'titanfit_enterprise_secret'
 
 # --- HELPERS ---
 def log_activity(action, admin="Admin"):
-    db.execute_query("INSERT INTO activity_log (action, admin_name) VALUES (%s, %s)", (action, admin))
+    db.execute_query("INSERT INTO activity_log (action, admin_name) VALUES (?, ?)", (action, admin))
 
 def get_member_status(expiry_date):
     if not expiry_date: return "Expired"
@@ -39,8 +39,8 @@ def dashboard_data():
     month = today.month
     year = today.year
     
-    collected = db.fetch_one("SELECT SUM(amount) as total FROM payments WHERE status = 'Paid' AND MONTH(payment_date) = %s AND YEAR(payment_date) = %s", (month, year))['total'] or 0
-    pending = db.fetch_one("SELECT SUM(amount) as total FROM payments WHERE status = 'Pending' AND MONTH(payment_date) = %s AND YEAR(payment_date) = %s", (month, year))['total'] or 0
+    collected = db.fetch_one("SELECT SUM(amount) as total FROM payments WHERE status = 'Paid' AND strftime('%m', payment_date) = ? AND strftime('%Y', payment_date) = ?", (f"{month:02d}", str(year)))['total'] or 0
+    pending = db.fetch_one("SELECT SUM(amount) as total FROM payments WHERE status = 'Pending' AND strftime('%m', payment_date) = ? AND strftime('%Y', payment_date) = ?", (f"{month:02d}", str(year)))['total'] or 0
     
     stats = {
         'total_members': db.fetch_one("SELECT COUNT(*) as count FROM members")['count'],
@@ -67,7 +67,7 @@ def dashboard_data():
     if not alerts and not db.fetch_all("SELECT id FROM announcements LIMIT 1"):
         combined_announcements = [] # Will show "No announcements today" in frontend
     else:
-        manual_announcements = db.fetch_all("SELECT title, content, DATE_FORMAT(created_at, '%%d %%b, %%H:%%i') as time FROM announcements ORDER BY created_at DESC LIMIT 5")
+        manual_announcements = db.fetch_all("SELECT title, content, strftime('%d %m, %H:%M', created_at) as time FROM announcements ORDER BY created_at DESC LIMIT 5")
         combined_announcements = []
         for a in alerts:
             combined_announcements.append({'title': a['title'], 'content': a['content'], 'time': 'System Alert', 'type': a['type']})
@@ -85,14 +85,14 @@ def dashboard_data():
     """)
     
     # Today's Activity Log
-    activities = db.fetch_all("SELECT action, DATE_FORMAT(created_at, '%%H:%%i') as time FROM activity_log ORDER BY created_at DESC LIMIT 5")
+    activities = db.fetch_all("SELECT action, strftime('%H:%M', created_at) as time FROM activity_log ORDER BY created_at DESC LIMIT 5")
     
     # Today's attendance split
     att_split = db.fetch_one("""
         SELECT 
             SUM(CASE WHEN status = 'Present' THEN 1 ELSE 0 END) as present,
             SUM(CASE WHEN status = 'Absent' THEN 1 ELSE 0 END) as absent
-        FROM attendance WHERE attendance_date = CURRENT_DATE
+        FROM attendance WHERE attendance_date = date('now')
     """)
     
     return jsonify({
@@ -109,15 +109,15 @@ def dashboard_data():
 @app.route('/analytics_data')
 def analytics_data():
     # 1. Member Growth (Monthly)
-    growth_query = "SELECT DATE_FORMAT(join_date, '%%b') as month, COUNT(*) as count FROM members WHERE YEAR(join_date) = YEAR(CURRENT_DATE) GROUP BY MONTH(join_date), month ORDER BY MONTH(join_date)"
+    growth_query = "SELECT strftime('%m', join_date) as month_num, COUNT(*) as count FROM members WHERE strftime('%Y', join_date) = strftime('%Y', 'now') GROUP BY month_num"
     growth_results = db.fetch_all(growth_query)
     
     # 2. Revenue (Monthly)
-    rev_query = "SELECT DATE_FORMAT(payment_date, '%%b') as month, SUM(amount) as total FROM payments WHERE status = 'Paid' AND YEAR(payment_date) = YEAR(CURRENT_DATE) GROUP BY MONTH(payment_date), month ORDER BY MONTH(payment_date)"
+    rev_query = "SELECT strftime('%m', payment_date) as month_num, SUM(amount) as total FROM payments WHERE status = 'Paid' AND strftime('%Y', payment_date) = strftime('%Y', 'now') GROUP BY month_num"
     rev_results = db.fetch_all(rev_query)
     
     # 3. Attendance (Monthly)
-    att_query = "SELECT DATE_FORMAT(attendance_date, '%%b') as month, COUNT(*) as count FROM attendance WHERE status = 'Present' AND YEAR(attendance_date) = YEAR(CURRENT_DATE) GROUP BY MONTH(attendance_date), month ORDER BY MONTH(attendance_date)"
+    att_query = "SELECT strftime('%m', attendance_date) as month_num, COUNT(*) as count FROM attendance WHERE status = 'Present' AND strftime('%Y', attendance_date) = strftime('%Y', 'now') GROUP BY month_num"
     att_results = db.fetch_all(att_query)
     
     # Syncing all to a standard month list
@@ -125,9 +125,10 @@ def analytics_data():
     current_month = datetime.now().month
     display_months = months[:current_month]
     
-    growth_map = {r['month']: r['count'] for r in growth_results}
-    rev_map = {r['month']: float(r['total']) for r in rev_results}
-    att_map = {r['month']: r['count'] for r in att_results}
+    # Map numeric strings back to month names for the maps
+    growth_map = {months[int(r['month_num'])-1]: r['count'] for r in growth_results if r['month_num']}
+    rev_map = {months[int(r['month_num'])-1]: float(r['total']) for r in rev_results if r['month_num']}
+    att_map = {months[int(r['month_num'])-1]: r['count'] for r in att_results if r['month_num']}
     
     return jsonify({
         "months": display_months,
@@ -144,7 +145,7 @@ def members():
     for m in all_members:
         new_status = get_member_status(m['expiry_date'])
         if m['status'] != new_status:
-            db.execute_query("UPDATE members SET status = %s WHERE id = %s", (new_status, m['id']))
+            db.execute_query("UPDATE members SET status = ? WHERE id = ?", (new_status, m['id']))
             m['status'] = new_status
             
     trainers_list = db.fetch_all("SELECT id, name FROM trainers")
@@ -164,7 +165,7 @@ def add_member():
     trainer_id = int(trainer_id) if trainer_id and trainer_id != 'None' else None
     
     db.execute_query(
-        "INSERT INTO members (name, age, phone, membership_plan, join_date, expiry_date, trainer_id) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+        "INSERT INTO members (name, age, phone, membership_plan, join_date, expiry_date, trainer_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
         (name, age, phone, plan, join_date, expiry_date, trainer_id)
     )
     log_activity(f"Registered new member: {name}")
@@ -179,7 +180,7 @@ def renew_member():
     method = request.form.get('method')
     
     # Calculate new expiry
-    member = db.fetch_one("SELECT name, expiry_date FROM members WHERE id = %s", (member_id,))
+    member = db.fetch_one("SELECT name, expiry_date FROM members WHERE id = ?", (member_id,))
     current_expiry = member['expiry_date'] if member['expiry_date'] > datetime.now().date() else datetime.now().date()
     
     from datetime import timedelta
@@ -190,11 +191,11 @@ def renew_member():
     
     new_expiry = current_expiry + timedelta(days=days)
     
-    db.execute_query("UPDATE members SET expiry_date = %s, membership_plan = %s, status = 'Active' WHERE id = %s", 
+    db.execute_query("UPDATE members SET expiry_date = ?, membership_plan = ?, status = 'Active' WHERE id = ?", 
                      (new_expiry, plan, member_id))
     
     # Log payment
-    db.execute_query("INSERT INTO payments (member_id, amount, payment_method, notes, status) VALUES (%s, %s, %s, %s, %s)",
+    db.execute_query("INSERT INTO payments (member_id, amount, payment_method, notes, status) VALUES (?, ?, ?, ?, ?)",
                      (member_id, amount, method, f"Renewal: {plan}", "Paid"))
     
     log_activity(f"Renewed membership for {member['name']} ({plan})")
@@ -203,9 +204,9 @@ def renew_member():
 
 @app.route('/member_profile/<int:id>')
 def member_profile(id):
-    member = db.fetch_one("SELECT m.*, t.name as trainer_name FROM members m LEFT JOIN trainers t ON m.trainer_id = t.id WHERE m.id = %s", (id,))
-    payments = db.fetch_all("SELECT * FROM payments WHERE member_id = %s ORDER BY payment_date DESC", (id,))
-    attendance = db.fetch_all("SELECT * FROM attendance WHERE member_id = %s ORDER BY attendance_date DESC LIMIT 30", (id,))
+    member = db.fetch_one("SELECT m.*, t.name as trainer_name FROM members m LEFT JOIN trainers t ON m.trainer_id = t.id WHERE m.id = ?", (id,))
+    payments = db.fetch_all("SELECT * FROM payments WHERE member_id = ? ORDER BY payment_date DESC", (id,))
+    attendance = db.fetch_all("SELECT * FROM attendance WHERE member_id = ? ORDER BY attendance_date DESC LIMIT 30", (id,))
     return render_template('member_profile.html', member=member, payments=payments, attendance=attendance)
 
 @app.route('/edit_member/<int:id>', methods=['POST'])
@@ -221,7 +222,7 @@ def edit_member(id):
     trainer_id = int(trainer_id) if trainer_id and trainer_id != 'None' else None
     
     db.execute_query(
-        "UPDATE members SET name=%s, age=%s, phone=%s, membership_plan=%s, join_date=%s, expiry_date=%s, trainer_id=%s WHERE id=%s",
+        "UPDATE members SET name=?, age=?, phone=?, membership_plan=?, join_date=?, expiry_date=?, trainer_id=? WHERE id=?",
         (name, age, phone, plan, join_date, expiry_date, trainer_id, id)
     )
     flash("Member profile synchronized!", "success")
@@ -229,7 +230,7 @@ def edit_member(id):
 
 @app.route('/delete_member/<int:id>')
 def delete_member(id):
-    db.execute_query("DELETE FROM members WHERE id=%s", (id,))
+    db.execute_query("DELETE FROM members WHERE id=?", (id,))
     flash("Member deleted successfully!", "success")
     return redirect(url_for('members'))
 
@@ -239,7 +240,7 @@ def trainers():
     all_trainers = db.fetch_all("SELECT * FROM trainers ORDER BY id DESC")
     # Fetch assigned members for each trainer
     for trainer in all_trainers:
-        trainer['assigned_members'] = db.fetch_all("SELECT name FROM members WHERE trainer_id = %s", (trainer['id'],))
+        trainer['assigned_members'] = db.fetch_all("SELECT name FROM members WHERE trainer_id = ?", (trainer['id'],))
         # Ensure salary and experience are present (db.py handles schema but might be None for old records)
         trainer['experience'] = trainer.get('experience', 0) or 0
         trainer['salary'] = float(trainer.get('salary', 0) or 0)
@@ -258,7 +259,7 @@ def add_trainer():
         return redirect(url_for('trainers'))
         
     db.execute_query(
-        "INSERT INTO trainers (name, specialization, phone, experience, salary) VALUES (%s, %s, %s, %s, %s)",
+        "INSERT INTO trainers (name, specialization, phone, experience, salary) VALUES (?, ?, ?, ?, ?)",
         (name, spec, phone, experience, salary)
     )
     log_activity(f"Added new trainer: {name}")
@@ -274,7 +275,7 @@ def edit_trainer(id):
     salary = request.form.get('salary', 0)
     
     db.execute_query(
-        "UPDATE trainers SET name=%s, specialization=%s, phone=%s, experience=%s, salary=%s WHERE id=%s",
+        "UPDATE trainers SET name=?, specialization=?, phone=?, experience=?, salary=? WHERE id=?",
         (name, spec, phone, experience, salary, id)
     )
     flash("Trainer updated successfully!", "success")
@@ -282,8 +283,8 @@ def edit_trainer(id):
 
 @app.route('/delete_trainer/<int:id>')
 def delete_trainer(id):
-    trainer = db.fetch_one("SELECT name FROM trainers WHERE id = %s", (id,))
-    db.execute_query("DELETE FROM trainers WHERE id=%s", (id,))
+    trainer = db.fetch_one("SELECT name FROM trainers WHERE id = ?", (id,))
+    db.execute_query("DELETE FROM trainers WHERE id=?", (id,))
     if trainer:
         log_activity(f"Removed trainer: {trainer['name']}")
     flash("Trainer deleted successfully!", "success")
@@ -308,11 +309,11 @@ def submit_attendance():
         status = entry['status']
         
         # Avoid duplicates for same member on same date
-        existing = db.fetch_one("SELECT id FROM attendance WHERE member_id = %s AND attendance_date = %s", (member_id, today))
+        existing = db.fetch_one("SELECT id FROM attendance WHERE member_id = ? AND attendance_date = ?", (member_id, today))
         if existing:
-            db.execute_query("UPDATE attendance SET status = %s WHERE id = %s", (status, existing['id']))
+            db.execute_query("UPDATE attendance SET status = ? WHERE id = ?", (status, existing['id']))
         else:
-            db.execute_query("INSERT INTO attendance (member_id, attendance_date, status) VALUES (%s, %s, %s)", (member_id, today, status))
+            db.execute_query("INSERT INTO attendance (member_id, attendance_date, status) VALUES (?, ?, ?)", (member_id, today, status))
     
     log_activity(f"Marked attendance for {len(attendance_list)} members")
     return jsonify({"success": True, "message": "Attendance submitted successfully!"})
@@ -330,7 +331,7 @@ def add_equipment():
     cond = request.form.get('condition')
     maint = request.form.get('last_maintenance')
     
-    db.execute_query("INSERT INTO equipment (name, quantity, gym_condition, last_maintenance) VALUES (%s, %s, %s, %s)",
+    db.execute_query("INSERT INTO equipment (name, quantity, gym_condition, last_maintenance) VALUES (?, ?, ?, ?)",
                      (name, qty, cond, maint))
     log_activity(f"Added new equipment: {name}")
     flash("Equipment added!", "success")
@@ -405,7 +406,7 @@ def add_payment():
     notes = request.form.get('notes')
     status = request.form.get('status', 'Paid')
     
-    db.execute_query("INSERT INTO payments (member_id, amount, notes, status) VALUES (%s, %s, %s, %s)", (member_id, amount, notes, status))
+    db.execute_query("INSERT INTO payments (member_id, amount, notes, status) VALUES (?, ?, ?, ?)", (member_id, amount, notes, status))
     flash("Payment recorded!", "success")
     return redirect(url_for('payments'))
 
@@ -420,10 +421,10 @@ def add_announcement():
     title = request.form.get('title')
     content = request.form.get('content')
     
-    db.execute_query("INSERT INTO announcements (title, content) VALUES (%s, %s)", (title, content))
+    db.execute_query("INSERT INTO announcements (title, content) VALUES (?, ?)", (title, content))
     log_activity(f"Posted announcement: {title}")
     flash("Announcement posted!", "success")
     return redirect(url_for('announcements'))
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(host="0.0.0.0", port=10000)

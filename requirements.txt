@@ -1,7 +1,5 @@
-Flask==3.0.0
-mysql-connector-python==8.2.0
-Werkzeug==3.0.1
-qrcode==7.4.2
-Pillow==10.1.0
-Flask-Login==0.6.3
-python-dotenv==1.0.0
+Flask
+Werkzeug
+Jinja2
+gunicorn
+# sqlite3 is built-in to Python

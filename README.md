@@ -1,60 +1,54 @@
 # TitanFit Gym Management System
 
-A modern, professional gym management web application built using **Flask** and **MySQL**. TitanFit allows administrators to manage members, trainers, attendance, payments, equipment, and membership renewals through a clean, high-performance dashboard interface.
+A modern, professional gym management web application built using **Flask** and **SQLite**. TitanFit is designed for seamless deployment on cloud platforms like **Render**, allowing administrators to manage members, trainers, attendance, payments, and equipment through a clean, high-performance dashboard.
 
 ## 🚀 Features
 
-- **📊 Dashboard Analytics**: Real-time statistics and growth tracking for your gym.
-- **👥 Member Management**: Register, track, and manage gym members with ease.
-- **🏋️ Trainer Management**: Keep records of trainers and their specializations.
+- **📊 Dashboard Analytics**: Real-time statistics and growth tracking.
+- **👥 Member Management**: Register, track, and manage gym members.
+- **🏋️ Trainer Management**: Track instructors and assigned members.
 - **📅 Attendance Tracking**: Modern, interactive daily attendance log.
-- **💳 Payment System**: Track transaction status (Paid / Pending) and financial history.
-- **🔄 Membership Renewal**: Streamlined system for handling member renewals.
-- **🤝 Trainer Assignment**: Assign professional trainers to specific members.
+- **💳 Payment System**: Track transaction status (Paid / Pending).
 - **🔧 Equipment Management**: Maintain an inventory of gym equipment.
-- **📢 Announcements**: Broadcast system for gym-wide updates and expiring membership alerts.
+- **📢 Announcements**: Broadcast system for gym-wide updates.
 
 ## 🛠️ Technology Stack
 
 - **Backend**: Python (Flask)
-- **Database**: MySQL
+- **Database**: SQLite (Automated initialization)
 - **Frontend**: HTML5, Vanilla CSS (Modern UI), JavaScript
 - **Styling**: Premium Dark Theme with Glassmorphism
+- **Deployment**: Ready for Render / Heroku / DigitalOcean
 
-## 💻 Installation Guide
+## ☁️ Cloud Deployment (Render)
 
-Follow these steps to run the project locally:
+This project is optimized for deployment on **Render**:
 
-### 1. Prerequisites
-- **Python 3.x** installed.
-- **XAMPP** or a standalone **MySQL** server running.
+1. **GitHub**: Push this repository to your GitHub account.
+2. **Render**: Create a new **Web Service**.
+3. **Runtime**: Select **Python**.
+4. **Build Command**: `pip install -r requirements.txt`
+5. **Start Command**: `gunicorn --bind 0.0.0.0:10000 backend.app:app` (or simply `python backend/app.py`)
+6. **Environment**: Render will automatically serve the app on port 10000.
 
-### 2. Install Dependencies
-Clone the repository and install the required Python packages:
+## 💻 Local Installation
 
-```bash
-pip install -r requirements.txt
-```
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/K-Deepak1610/Gym-Management-System.git
+   ```
+2. **Install Dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Run the Application**:
+   ```bash
+   python backend/app.py
+   ```
+4. **Access in Browser**:
+   [http://127.0.0.1:10000](http://127.0.0.1:10000)
 
-### 3. Database Setup
-1. Start **MySQL** (via XAMPP or local service).
-2. Create a database named `titanfit` or run the provided schema:
-```bash
-# You can use the setup script to initialize the database
-python database/setup_db.py
-```
-*Note: Ensure your database credentials in `backend/db.py` or `.env` are correct.*
-
-### 4. Run the Application
-Start the Flask server:
-
-```bash
-python backend/app.py
-```
-
-### 5. Open in Browser
-Visit the following URL in your web browser:
-[http://127.0.0.1:5000](http://127.0.0.1:5000)
+*Note: The system automatically creates `database/gym.db` and initializes the schema on first run.*
 
 ---
 *Developed with ❤️ for TitanFit Gym.*
