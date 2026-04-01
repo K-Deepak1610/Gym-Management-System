@@ -1,53 +1,78 @@
 {% extends "base.html" %}
 
-{% block header_title %}Announcement Panel{% endblock %}
+{% block header_title %}Broadcast Center{% endblock %}
+
+{% block header_actions %}
+<button onclick="document.getElementById('addAnnModal').classList.remove('hidden')" class="btn-primary flex items-center bg-brand-600 text-white border-none hover:bg-brand-500">
+    <i class="fas fa-bullhorn mr-2"></i> New Broadcast
+</button>
+{% endblock %}
 
 {% block content %}
-<div class="flex justify-between items-center mb-8 animate-slide">
-    <p class="text-slate-500 text-sm">Post updates and news for the gym community.</p>
-    <button onclick="document.getElementById('addAnnModal').classList.remove('hidden')" class="btn-titan px-8 py-3 flex items-center gap-2">
-        <i class="fas fa-bullhorn"></i> New Announcement
-    </button>
-</div>
-
-<div class="grid grid-cols-1 md:grid-cols-2 gap-8 animate-slide">
-    {% for ann in announcements %}
-    <div class="card-titan p-8 border-l-4 border-cyan-400">
-        <div class="flex justify-between items-start mb-4">
-            <h3 class="text-lg font-bold text-white">{{ ann.title }}</h3>
-            <span class="text-[10px] font-medium text-slate-500 uppercase tracking-widest">{{ ann.created_at.strftime('%B %d, %Y') }}</span>
-        </div>
-        <p class="text-sm text-slate-400 leading-relaxed mb-6">{{ ann.content }}</p>
-        <div class="flex justify-between items-center pt-6 border-t border-white/5">
-            <span class="text-[10px] text-slate-600">ID: TITAN-ANN-{{ ann.id }}</span>
-            <div class="flex gap-2">
-                <button class="p-2 text-slate-600 hover:text-white transition-colors"><i class="fas fa-edit"></i></button>
-                <button class="p-2 text-slate-600 hover:text-rose-500 transition-colors"><i class="fas fa-trash-alt"></i></button>
-            </div>
+<div class="max-w-4xl mx-auto">
+    <div class="mb-8 border-b border-zinc-800 pb-4 flex justify-between items-end">
+        <div>
+            <h2 class="text-lg font-medium text-white mb-1">Global Announcements</h2>
+            <p class="text-sm text-zinc-500">Important notices broadcasted to the entire facility.</p>
         </div>
     </div>
-    {% else %}
-    <div class="col-span-full py-20 text-center opacity-30 italic">No announcements posted.</div>
-    {% endfor %}
+
+    <div class="space-y-6">
+        {% for ann in announcements %}
+        <div class="card-premium p-6 md:p-8 border-l-4 border-brand-500 relative group overflow-hidden">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4 relative z-10">
+                <h3 class="text-xl font-semibold text-white tracking-tight">{{ ann.title }}</h3>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-bold tracking-widest uppercase bg-zinc-800 text-zinc-400 border border-zinc-700">
+                    <i class="far fa-clock"></i> {{ ann.created_at | formatdate }}
+                </span>
+            </div>
+            
+            <p class="text-sm text-zinc-400 leading-relaxed mb-6 relative z-10">{{ ann.content }}</p>
+            
+            <div class="flex justify-between items-center pt-5 border-t border-zinc-800/50 relative z-10 mt-auto opacity-70 group-hover:opacity-100 transition-opacity">
+                <span class="text-[10px] font-mono text-zinc-600 font-medium">REF: BROADCAST-{{ "%04d" % ann.id }}</span>
+                <div class="flex gap-2">
+                    <button class="w-8 h-8 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white border border-zinc-700 transition-colors flex items-center justify-center">
+                        <i class="fas fa-edit text-xs"></i>
+                    </button>
+                    <a href="#" class="w-8 h-8 rounded bg-zinc-800 hover:bg-red-500/20 text-zinc-400 hover:text-red-400 border border-zinc-700 hover:border-red-500/20 transition-colors flex items-center justify-center">
+                        <i class="fas fa-trash text-xs"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="absolute -right-8 -top-8 text-brand-500/5 text-9xl transform rotate-12 group-hover:rotate-6 group-hover:scale-110 transition-all duration-700 pointer-events-none">
+                <i class="fas fa-bullhorn"></i>
+            </div>
+        </div>
+        {% else %}
+        <div class="py-24 text-center border-2 border-dashed border-zinc-800 rounded-2xl bg-zinc-900/20">
+            <div class="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4 text-zinc-600">
+                <i class="fas fa-comment-slash text-2xl"></i>
+            </div>
+            <p class="text-zinc-400 text-sm">No active broadcasts in the system.</p>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 
 <!-- Add Announcement Modal -->
-<div id="addAnnModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-    <div class="card-titan w-full max-w-lg p-10 animate-slide">
-        <div class="flex justify-between items-center mb-8">
-            <h3 class="text-2xl font-bold text-white">New Announcement</h3>
-            <button onclick="document.getElementById('addAnnModal').classList.add('hidden')" class="text-slate-500 hover:text-white"><i class="fas fa-times"></i></button>
-        </div>
-        <form action="/add_announcement" method="POST" class="space-y-6">
+<div id="addAnnModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl w-full max-w-lg p-6 md:p-8 shadow-2xl relative">
+        <button onclick="document.getElementById('addAnnModal').classList.add('hidden')" class="absolute top-6 right-6 text-zinc-500 hover:text-white"><i class="fas fa-times"></i></button>
+        <h2 class="text-xl font-semibold text-white mb-6">Create Broadcast</h2>
+        <form action="/add_announcement" method="POST" class="space-y-4">
             <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Subject / Title</label>
-                <input type="text" name="title" required class="w-full bg-slate-800 border border-white/5 rounded-xl px-4 py-3 outline-none focus:border-cyan-400/50 transition-all text-sm">
+                <label class="block text-xs font-medium text-zinc-400 mb-1.5">Subject Heading</label>
+                <input type="text" name="title" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-white focus:border-brand-500/50 outline-none placeholder-zinc-700" placeholder="e.g. Holiday Closure Schedule">
             </div>
             <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Message Content</label>
-                <textarea name="content" rows="5" required class="w-full bg-slate-800 border border-white/5 rounded-xl px-4 py-3 outline-none focus:border-cyan-400/50 transition-all text-sm" placeholder="Provide details about the update..."></textarea>
+                <label class="block text-xs font-medium text-zinc-400 mb-1.5">Message Body</label>
+                <textarea name="content" rows="6" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-300 focus:border-brand-500/50 outline-none resize-none placeholder-zinc-700" placeholder="Type the broadcast message here..."></textarea>
             </div>
-            <button type="submit" class="w-full btn-titan py-4 mt-6 uppercase tracking-widest">Post Announcement</button>
+            <div class="pt-4">
+                <button type="submit" class="btn-primary w-full justify-center">Publish Broadcast</button>
+            </div>
         </form>
     </div>
 </div>

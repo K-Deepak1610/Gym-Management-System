@@ -2,9 +2,22 @@ __pycache__/
 *.pyc
 .env
 .venv/
+venv/
+env/
 node_modules/
 *.log
 .DS_Store
 db.sqlite3
 *.bak
 *.tmp
+
+# SQLite databases (Don't push live production data)
+*.sqlite3
+*.db
+database/gym.db
+database/*.db
+
+# Temporary debugging scripts generated during debug phase
+test_error.py
+test_error2.py
+error_output.html

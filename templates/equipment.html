@@ -1,78 +1,74 @@
 {% extends "base.html" %}
 
-{% block header_title %}Equipment Inventory{% endblock %}
+{% block header_title %}Equipment & Asset Inventory{% endblock %}
+
+{% block header_actions %}
+<button onclick="document.getElementById('addEquipmentModal').classList.remove('hidden')" class="btn-primary flex items-center">
+    <i class="fas fa-boxes mr-2 opacity-70"></i> Log Asset
+</button>
+{% endblock %}
 
 {% block content %}
-<div class="flex justify-between items-center mb-8 animate-slide">
-    <div class="relative w-96">
-        <i class="fas fa-search absolute left-4 top-3.5 text-slate-500 text-sm"></i>
-        <input type="text" placeholder="Search equipment..." class="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/5 rounded-2xl outline-none focus:border-cyan-400/30 transition-all text-sm backdrop-blur-sm">
-    </div>
-    <button onclick="toggleModal('addEquipmentModal')" class="btn-titan px-8 py-3 flex items-center gap-2 font-bold uppercase tracking-widest text-xs">
-        <i class="fas fa-plus"></i> Add Equipment
-    </button>
-</div>
-
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide" style="animation-delay: 0.1s;">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for item in items %}
-    <div class="card-titan p-8 flex flex-col justify-between group hover:border-cyan-400/30 transition-all">
-        <div>
-            <div class="flex justify-between items-start mb-6">
-                <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-cyan-400 transition-colors">
-                    <i class="fas fa-dumbbell text-xl"></i>
-                </div>
-                <span class="px-3 py-1 bg-emerald-400/10 text-emerald-400 text-[10px] font-black uppercase rounded-lg border border-emerald-400/20">
-                    {{ item.gym_condition }}
-                </span>
+    <div class="card-premium p-6 flex flex-col justify-between group border border-zinc-800 hover:border-zinc-700 transition-colors relative overflow-hidden">
+        
+        <div class="flex justify-between items-start mb-4">
+            <div class="w-10 h-10 bg-zinc-900 rounded-lg border border-zinc-800 flex items-center justify-center text-zinc-500 group-hover:text-brand-400 transition-colors shadow-sm">
+                <i class="fas fa-dumbbell"></i>
             </div>
-            <h3 class="text-xl font-black text-white uppercase tracking-tighter mb-2">{{ item.name }}</h3>
-            <div class="flex items-center gap-3 text-xs text-slate-500 font-bold uppercase mb-6">
-                <span>Quantity: <span class="text-white">{{ item.quantity }}</span></span>
-                <span class="w-1 h-1 rounded-full bg-slate-700"></span>
-                <span>Active</span>
-            </div>
+            
+            {% if 'Repair' in item.gym_condition %}
+                <span class="px-2 py-0.5 bg-red-500/10 text-red-500 text-[10px] font-bold uppercase tracking-widest rounded border border-red-500/20">{{ item.gym_condition }}</span>
+            {% elif 'Fair' in item.gym_condition %}
+                <span class="px-2 py-0.5 bg-amber-500/10 text-amber-500 text-[10px] font-bold uppercase tracking-widest rounded border border-amber-500/20">{{ item.gym_condition }}</span>
+            {% else %}
+                <span class="px-2 py-0.5 bg-brand-500/10 text-brand-400 text-[10px] font-bold uppercase tracking-widest rounded border border-brand-500/20">{{ item.gym_condition }}</span>
+            {% endif %}
         </div>
         
-        <div class="pt-6 border-t border-white/5">
-            <div class="flex justify-between items-center">
-                <div>
-                    <p class="text-[9px] text-slate-600 uppercase font-black tracking-widest mb-1">Last Maintenance</p>
-                    <p class="text-xs font-bold text-slate-300">{{ item.last_maintenance or 'N/A' }}</p>
-                </div>
-                <button class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-slate-500 hover:text-cyan-400 transition-all">
-                    <i class="fas fa-tools"></i>
-                </button>
+        <h3 class="text-lg font-semibold text-white tracking-tight mb-1">{{ item.name }}</h3>
+        <p class="text-xs text-zinc-500 font-medium. mb-5">Quantity Active: <span class="text-white">{{ item.quantity }}</span></p>
+        
+        <div class="pt-4 border-t border-zinc-800 flex justify-between items-end mt-auto">
+            <div>
+                <p class="text-[9px] text-zinc-600 uppercase font-black tracking-widest mb-0.5">Last Maintained</p>
+                <p class="text-xs font-semibold text-zinc-300"><i class="far fa-calendar-check mr-1 text-zinc-500"></i> {{ item.last_maintenance | formatdate }}</p>
             </div>
+            <button class="w-7 h-7 rounded border border-zinc-700 bg-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-500 flex items-center justify-center transition-colors">
+                <i class="fas fa-hammer text-[10px]"></i>
+            </button>
         </div>
     </div>
     {% else %}
-    <div class="col-span-full py-24 flex flex-col items-center opacity-20">
-        <i class="fas fa-boxes text-5xl mb-4"></i>
-        <p class="text-sm italic font-medium">Inventory is empty. Register your gym assets.</p>
+    <div class="col-span-full py-20 text-center border-2 border-dashed border-zinc-800 rounded-2xl bg-zinc-900/20">
+        <div class="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4 text-zinc-600">
+            <i class="fas fa-box-open text-2xl"></i>
+        </div>
+        <p class="text-zinc-400 text-sm">Asset warehouse is empty.</p>
+        <button onclick="document.getElementById('addEquipmentModal').classList.remove('hidden')" class="text-brand-400 text-xs font-medium mt-2 hover:underline">Log first equipment batch</button>
     </div>
     {% endfor %}
 </div>
 
 <!-- Add Equipment Modal -->
-<div id="addEquipmentModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-    <div class="card-titan w-full max-w-lg p-10 animate-slide border border-white/10">
-        <div class="flex justify-between items-center mb-8">
-            <h3 class="text-2xl font-black text-white uppercase tracking-tighter">New Asset</h3>
-            <button onclick="toggleModal('addEquipmentModal')" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-500 hover:text-white transition-all"><i class="fas fa-times"></i></button>
-        </div>
-        <form action="/add_equipment" method="POST" class="space-y-6">
+<div id="addEquipmentModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl w-full max-w-lg p-6 md:p-8 shadow-2xl relative">
+        <button onclick="document.getElementById('addEquipmentModal').classList.add('hidden')" class="absolute top-6 right-6 text-zinc-500 hover:text-white"><i class="fas fa-times"></i></button>
+        <h2 class="text-xl font-semibold text-white mb-6">Asset Registration</h2>
+        <form action="/add_equipment" method="POST" class="space-y-4">
             <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Equipment Name</label>
-                <input type="text" name="name" required class="w-full bg-slate-900/50 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-cyan-400/40 transition-all text-sm">
+                <label class="block text-xs font-medium text-zinc-400 mb-1.5">Equipment Nomenclature</label>
+                <input type="text" name="name" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-brand-500/50 outline-none">
             </div>
-            <div class="grid grid-cols-2 gap-6">
+            <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Quantity</label>
-                    <input type="number" name="quantity" value="1" required class="w-full bg-slate-900/50 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-cyan-400/40 transition-all text-sm">
+                    <label class="block text-xs font-medium text-zinc-400 mb-1.5">Volume/Quantity</label>
+                    <input type="number" name="quantity" value="1" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-brand-500/50 outline-none">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Condition</label>
-                    <select name="condition" class="w-full bg-slate-900/50 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-cyan-400/40 transition-all text-sm appearance-none font-bold text-slate-300 uppercase cursor-pointer">
+                    <label class="block text-xs font-medium text-zinc-400 mb-1.5">Asset Condition</label>
+                    <select name="condition" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-brand-500/50 outline-none">
                         <option>Excellent</option>
                         <option>Good</option>
                         <option>Fair</option>
@@ -81,17 +77,13 @@
                 </div>
             </div>
             <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Last Maintenance Date</label>
-                <input type="date" name="last_maintenance" required class="w-full bg-slate-900/50 border border-white/5 rounded-2xl px-5 py-3.5 outline-none focus:border-cyan-400/40 transition-all text-sm [color-scheme:dark]">
+                <label class="block text-xs font-medium text-zinc-400 mb-1.5">Service/Maintenance Date</label>
+                <input type="date" name="last_maintenance" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-brand-500/50 outline-none" style="color-scheme: dark;">
             </div>
-            <button type="submit" class="w-full btn-titan py-4 mt-4 font-black uppercase tracking-[0.2em] text-xs">Register Equipment</button>
+            <div class="pt-4">
+                <button type="submit" class="btn-primary w-full justify-center">Commit to Ledger</button>
+            </div>
         </form>
     </div>
 </div>
-
-<script>
-    function toggleModal(id) {
-        document.getElementById(id).classList.toggle('hidden');
-    }
-</script>
 {% endblock %}

@@ -1,134 +1,164 @@
 {% extends "base.html" %}
 
-{% block header_title %}Dashboard{% endblock %}
+{% block header_title %}Dashboard Insights{% endblock %}
+
+{% block header_actions %}
+<button class="btn-primary" onclick="initDashboard()"><i class="fas fa-sync-alt mr-2 text-xs opacity-70"></i> Refresh Data</button>
+{% endblock %}
 
 {% block content %}
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10 overflow-hidden">
-    <!-- Members Card -->
-    <div class="card-titan p-6 group animate-count" style="animation-delay: 0.1s;">
-        <div class="flex justify-between items-start mb-4">
-            <div class="w-12 h-12 rounded-2xl bg-cyan-400/10 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-all duration-500">
-                <i class="fas fa-users text-xl"></i>
-            </div>
-            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Active Base</span>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <!-- Members Metric -->
+    <div class="card-premium p-5 flex flex-col justify-between">
+        <div class="flex justify-between items-start mb-2">
+            <h3 class="text-sm font-medium text-zinc-400">Total Active Base</h3>
+            <i class="fas fa-users text-zinc-600"></i>
         </div>
-        <h3 class="text-3xl font-black text-white tracking-tighter mb-1" id="stat-members">0</h3>
-        <p class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1">
-            <i class="fas fa-caret-up"></i> +12.5% <span class="text-slate-600 font-medium">vs last month</span>
-        </p>
+        <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-semibold text-white tracking-tight" id="stat-members">--</span>
+            <span class="text-xs font-medium text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded">+12%</span>
+        </div>
+        <p class="text-xs text-zinc-500 mt-2 hover:text-zinc-300 transition-colors cursor-default"><i class="fas fa-arrow-trend-up mr-1 text-emerald-500/50"></i> vs last month</p>
     </div>
 
-    <!-- Trainers Card -->
-    <div class="card-titan p-6 group animate-count" style="animation-delay: 0.2s;">
-        <div class="flex justify-between items-start mb-4">
-            <div class="w-12 h-12 rounded-2xl bg-emerald-400/10 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-all duration-500">
-                <i class="fas fa-user-tie text-xl"></i>
-            </div>
-            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Expert Staff</span>
+    <!-- Trainers Metric -->
+    <div class="card-premium p-5 flex flex-col justify-between">
+        <div class="flex justify-between items-start mb-2">
+            <h3 class="text-sm font-medium text-zinc-400">Available Staff</h3>
+            <i class="fas fa-id-badge text-zinc-600"></i>
         </div>
-        <h3 class="text-3xl font-black text-white tracking-tighter mb-1" id="stat-trainers">0</h3>
-        <p class="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Global Trainers</p>
+        <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-semibold text-white tracking-tight" id="stat-trainers">--</span>
+            <span class="text-xs font-medium text-zinc-400 bg-zinc-800 px-1.5 py-0.5 rounded">Steady</span>
+        </div>
+        <p class="text-xs text-zinc-500 mt-2 hover:text-zinc-300 transition-colors cursor-default">Active across all shifts</p>
     </div>
 
-    <!-- Revenue Card -->
-    <div class="card-titan p-6 group animate-count" style="animation-delay: 0.3s;">
-        <div class="flex justify-between items-start mb-4">
-            <div class="w-12 h-12 rounded-2xl bg-purple-400/10 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-all duration-500">
-                <i class="fas fa-wallet text-xl"></i>
-            </div>
-            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Revenue (MTD)</span>
+    <!-- Revenue Metric -->
+    <div class="card-premium p-5 flex flex-col justify-between">
+        <div class="flex justify-between items-start mb-2">
+            <h3 class="text-sm font-medium text-zinc-400">Monthly Run Rate (MRR)</h3>
+            <i class="fas fa-wallet text-zinc-600"></i>
         </div>
-        <h3 class="text-3xl font-black text-white tracking-tighter mb-1">₹<span id="stat-revenue">0</span></h3>
-        <p class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1">
-            <i class="fas fa-caret-up"></i> +8.2% <span class="text-slate-600 font-medium">this week</span>
-        </p>
+        <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-semibold text-white tracking-tight">₹<span id="stat-revenue">--</span></span>
+            <span class="text-xs font-medium text-brand-500 bg-brand-500/10 px-1.5 py-0.5 rounded">+4.2%</span>
+        </div>
+        <p class="text-xs text-zinc-500 mt-2 hover:text-zinc-300 transition-colors cursor-default">Excludes pending ₹<span id="stat-pending">--</span></p>
     </div>
 
-    <!-- Attendance Card -->
-    <div class="card-titan p-6 group animate-count" style="animation-delay: 0.4s;">
-        <div class="flex justify-between items-start mb-4">
-            <div class="w-12 h-12 rounded-2xl bg-orange-400/10 flex items-center justify-center text-orange-400 group-hover:scale-110 transition-all duration-500">
-                <i class="fas fa-chart-line text-xl"></i>
-            </div>
-            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Engagement</span>
+    <!-- AI Retention Risk Insight -->
+    <div class="card-premium p-5 flex flex-col justify-between border-brand-500/30 bg-gradient-to-br from-zinc-900 to-zinc-900/50 relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-2 opacity-10">
+            <i class="fas fa-brain text-6xl text-brand-500"></i>
         </div>
-        <h3 class="text-3xl font-black text-white tracking-tighter mb-1"><span id="stat-attendance">0</span>%</h3>
-        <p class="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-medium">Average Daily</p>
+        <div class="flex justify-between items-start mb-2 relative z-10">
+            <h3 class="text-sm font-medium text-brand-400 flex items-center gap-1.5">
+                <i class="fas fa-sparkles text-xs"></i> AI Insight
+            </h3>
+        </div>
+        <div class="flex items-baseline gap-2 relative z-10">
+            <span class="text-2xl font-semibold text-white tracking-tight">3 Members</span>
+        </div>
+        <p class="text-xs text-zinc-400 mt-2 relative z-10 leading-relaxed">predicted to churn in 7 days. Enable automated retention workflow?</p>
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
-    <!-- Business Analytics Chart -->
-    <div class="lg:col-span-2 card-titan p-8">
-        <div class="flex justify-between items-center mb-8">
-            <h3 class="font-bold text-lg">Business Analytics</h3>
-            <div class="flex items-center gap-4 text-[10px]">
-                <div class="flex items-center gap-2 text-cyan-400"><span class="w-2 h-2 rounded-full bg-cyan-400"></span> Growth</div>
-                <div class="flex items-center gap-2 text-emerald-400"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Revenue</div>
-                <div class="flex items-center gap-2 text-purple-400"><span class="w-2 h-2 rounded-full bg-purple-400"></span> Activity</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Main Chart -->
+    <div class="lg:col-span-2 card-premium p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="font-medium text-sm text-white">Revenue & Growth Trajectory</h3>
+            <div class="flex items-center gap-3 text-xs font-medium text-zinc-400 border border-zinc-800 rounded-md p-1 px-2 bg-zinc-950">
+                <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span> New CMRR</div>
+                <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Signups</div>
             </div>
         </div>
-        <div class="chart-container">
+        <div class="h-72">
             <canvas id="businessChart"></canvas>
         </div>
     </div>
 
     <!-- Attendance Today Chart -->
-    <div class="card-titan p-8">
-        <h3 class="font-bold text-lg mb-8">Today's Attendance</h3>
-        <div class="relative h-64 flex items-center justify-center">
+    <div class="card-premium p-6 flex flex-col">
+        <h3 class="font-medium text-sm text-white mb-6">Daily Engagement Spline</h3>
+        <div class="relative h-48 flex items-center justify-center mb-4">
             <canvas id="todayAttendanceChart"></canvas>
-            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span id="att-present-val" class="text-3xl font-black text-cyan-400">0</span>
-                <span class="text-[10px] uppercase font-bold text-slate-500">Present</span>
+            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-2">
+                <span id="att-present-val" class="text-2xl font-semibold text-white tracking-tight">--</span>
+                <span class="text-xs text-zinc-500 font-medium">Checked In</span>
             </div>
         </div>
-        <div class="grid grid-cols-2 gap-4 mt-8">
-            <div class="bg-white/5 p-4 rounded-2xl text-center">
-                <p class="text-[10px] uppercase font-bold text-slate-500 mb-1">Absent</p>
-                <p id="att-absent-val" class="text-lg font-bold text-rose-500">0</p>
+        <div class="mt-auto pt-4 border-t border-zinc-800 grid grid-cols-2 gap-4">
+            <div>
+                <p class="text-xs text-zinc-500 mb-0.5 font-medium">No Shows</p>
+                <p id="att-absent-val" class="text-sm font-semibold text-white">--</p>
             </div>
-            <div class="bg-white/5 p-4 rounded-2xl text-center">
-                <p class="text-[10px] uppercase font-bold text-slate-500 mb-1">Total</p>
-                <p id="att-total-val" class="text-lg font-bold text-white">0</p>
+            <div>
+                <p class="text-xs text-zinc-500 mb-0.5 font-medium">Total Roster</p>
+                <p id="att-total-val" class="text-sm font-semibold text-white">--</p>
             </div>
         </div>
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
-    <!-- Top Members Leaderboard -->
-    <div class="card-titan p-8">
-        <div class="flex justify-between items-center mb-8">
-            <h3 class="font-bold text-lg">Top Active Members</h3>
-            <i class="fas fa-crown text-amber-400"></i>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Fast Check-in / Webhook Mock -->
+    <div class="card-premium p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="font-medium text-sm text-white">Kiosk Actions</h3>
+            <span class="text-[10px] font-medium text-brand-400 bg-brand-500/10 px-2 py-1 rounded">Beta</span>
         </div>
-        <div id="leaderboard-list" class="space-y-6">
-            <p class="text-sm text-slate-600 animate-pulse">Ranking members...</p>
+        
+        <div class="flex flex-col gap-3">
+            <button class="flex items-center justify-between p-4 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-zinc-600 transition-colors group text-left">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded bg-zinc-900 border border-zinc-700 flex items-center justify-center text-zinc-400 group-hover:bg-brand-500/10 group-hover:text-brand-400 group-hover:border-brand-500/30 transition-colors">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-white mb-0.5">Launch QR Scanner</p>
+                        <p class="text-xs text-zinc-500">Fast check-in via unified camera API</p>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right text-zinc-600 text-xs group-hover:text-white transition-colors"></i>
+            </button>
+
+            <button class="flex items-center justify-between p-4 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-zinc-600 transition-colors group text-left">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded bg-zinc-900 border border-zinc-700 flex items-center justify-center text-zinc-400 group-hover:bg-emerald-500/10 group-hover:text-emerald-400 group-hover:border-emerald-500/30 transition-colors">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-white mb-0.5">Send Due Payment Reminders</p>
+                        <p class="text-xs text-zinc-500">Trigger Twilio webhook for 12 members</p>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right text-zinc-600 text-xs group-hover:text-white transition-colors"></i>
+            </button>
         </div>
     </div>
 
     <!-- Admin Activity Log -->
-    <div class="card-titan p-8">
-        <h3 class="font-bold text-lg mb-8">System Activity</h3>
-        <div id="activity-log" class="space-y-6">
-            <p class="text-sm text-slate-600 animate-pulse">Monitoring actions...</p>
+    <div class="card-premium p-6 flex flex-col">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="font-medium text-sm text-white">Audit Trail</h3>
+            <a href="#" class="text-xs font-medium text-zinc-400 hover:text-white transition-colors">View All</a>
         </div>
-    </div>
-
-    <!-- Recent Announcements -->
-    <div class="card-titan p-8 flex flex-col">
-        <h3 class="font-bold text-lg mb-8">Announcements</h3>
-        <div id="announcement-list" class="space-y-6 flex-1 overflow-y-auto pr-2 max-h-[350px]">
-            <p class="text-sm text-slate-600 animate-pulse">Loading updates...</p>
+        <div id="activity-log" class="space-y-4 flex-1">
+            <p class="text-xs text-zinc-500 animate-pulse">Syncing logs...</p>
         </div>
     </div>
 </div>
+
 {% endblock %}
 
 {% block scripts %}
 <script>
+    Chart.defaults.color = '#71717a';
+    Chart.defaults.font.family = 'Inter, sans-serif';
+    
     let businessChart = null;
     let todayChart = null;
 
@@ -142,83 +172,39 @@
             const statsData = await statsRes.json();
             const analyticsData = await analyticsRes.json();
 
-            updateStats(statsData.stats);
-            renderAnnouncements(statsData.announcements);
-            renderLeaderboard(statsData.leaderboard);
+            document.getElementById('stat-members').innerText = statsData.stats.total_members;
+            document.getElementById('stat-trainers').innerText = statsData.stats.active_trainers;
+            document.getElementById('stat-revenue').innerText = statsData.stats.fee_collected.toLocaleString();
+            document.getElementById('stat-pending').innerText = statsData.stats.fee_pending.toLocaleString();
+
             renderActivityLog(statsData.activities);
             renderTodayAttendance(statsData.att_split);
             renderBusinessChart(analyticsData);
 
+            showToast('Dashboard metrics synchronized', 'success');
         } catch (error) {
             console.error("Dashboard failed to load:", error);
+            showToast('Failed to sync metrics', 'error');
         }
-    }
-
-    function updateStats(stats) {
-        document.getElementById('stat-members').setAttribute('data-target', stats.total_members);
-        document.getElementById('stat-trainers').setAttribute('data-target', stats.active_trainers);
-        document.getElementById('stat-revenue').setAttribute('data-target', stats.fee_collected);
-        document.getElementById('stat-attendance').setAttribute('data-target', stats.attendance_rate);
-        animateCounters();
-    }
-
-    function renderLeaderboard(members) {
-        const container = document.getElementById('leaderboard-list');
-        container.innerHTML = '';
-        members.forEach((m, i) => {
-            const item = document.createElement('div');
-            item.className = 'flex items-center justify-between p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-all';
-            item.innerHTML = `
-                <div class="flex items-center gap-4">
-                    <span class="text-xs font-black text-slate-500">#${i + 1}</span>
-                    <span class="text-sm font-bold text-slate-200">${m.name}</span>
-                </div>
-                <div class="text-xs font-bold text-cyan-400 bg-cyan-400/10 px-3 py-1 rounded-full">${m.visits} Visits</div>
-            `;
-            container.appendChild(item);
-        });
     }
 
     function renderActivityLog(activities) {
         const container = document.getElementById('activity-log');
         container.innerHTML = '';
-        activities.forEach(a => {
-            const item = document.createElement('div');
-            item.className = 'flex items-start gap-4';
-            item.innerHTML = `
-                <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5"></div>
-                <div>
-                    <p class="text-xs font-medium text-slate-300">${a.action}</p>
-                    <span class="text-[9px] uppercase tracking-widest text-slate-600">${a.time}</span>
-                </div>
-            `;
-            container.appendChild(item);
-        });
-    }
-
-    function renderAnnouncements(ann) {
-        const container = document.getElementById('announcement-list');
-        container.innerHTML = '';
-        
-        if (ann.length === 0) {
-            container.innerHTML = `<p class="text-xs font-bold text-slate-600 uppercase tracking-widest text-center mt-10">No announcements today</p>`;
+        if(!activities.length) {
+            container.innerHTML = `<p class="text-xs font-medium text-zinc-600 text-center mt-8">No recent activity detected.</p>`;
             return;
         }
 
-        ann.forEach(a => {
+        activities.forEach(a => {
             const item = document.createElement('div');
-            item.className = 'mb-6 pb-6 border-b border-white/5 last:border-0 relative pl-6';
-            
-            // Colored indicator logic
-            let indicatorColor = 'var(--accent-cyan)';
-            if (a.title.toLowerCase().includes('expired')) indicatorColor = 'var(--accent-rose)';
-            else if (a.title.toLowerCase().includes('expires')) indicatorColor = 'var(--accent-orange)';
-            
+            item.className = 'flex items-start gap-4 pb-4 border-b border-zinc-800/50 last:border-0 last:pb-0';
             item.innerHTML = `
-                <div class="absolute left-0 top-1 w-1.5 h-full rounded-full opacity-50" style="background: ${indicatorColor}"></div>
-                <h4 class="text-sm font-bold text-slate-200 mb-1">${a.title}</h4>
-                <p class="text-xs text-slate-500 leading-relaxed">${a.content}</p>
-                <p class="text-[9px] text-slate-600 uppercase mt-3 tracking-widest font-black">${a.time}</p>
+                <div class="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-zinc-600 border ring-4 ring-zinc-900"></div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-medium text-zinc-300 truncate">${a.action}</p>
+                    <p class="text-[10px] text-zinc-500 mt-0.5">${a.time}</p>
+                </div>
             `;
             container.appendChild(item);
         });
@@ -227,6 +213,7 @@
     function renderTodayAttendance(split) {
         const ctx = document.getElementById('todayAttendanceChart').getContext('2d');
         const total = split.present + split.absent;
+        
         document.getElementById('att-present-val').innerText = split.present;
         document.getElementById('att-absent-val').innerText = split.absent;
         document.getElementById('att-total-val').innerText = total;
@@ -237,15 +224,16 @@
             data: {
                 datasets: [{
                     data: [split.present, split.absent || (total === 0 ? 1 : 0)],
-                    backgroundColor: ['#22d3ee', total === 0 ? 'rgba(255,255,255,0.05)' : '#f43f5e'],
+                    backgroundColor: ['#10b981', total === 0 ? '#27272a' : '#27272a'],
                     borderWidth: 0,
-                    cutout: '85%'
+                    hoverOffset: 4,
+                    cutout: '80%'
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } }
+                plugins: { legend: { display: false }, tooltip: { enabled: false } }
             }
         });
     }
@@ -255,56 +243,43 @@
         if (businessChart) businessChart.destroy();
 
         businessChart = new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: data.months,
                 datasets: [
-                    { label: 'Growth', data: data.member_growth, backgroundColor: '#22d3ee', borderRadius: 6, barThickness: 12 },
-                    { label: 'Revenue', data: data.revenue.map(r => r / 100), backgroundColor: '#4ade80', borderRadius: 6, barThickness: 12 },
-                    { label: 'Activity', data: data.attendance, backgroundColor: '#a855f7', borderRadius: 6, barThickness: 12 }
+                    { 
+                        label: 'Revenue (₹ Hundreds)', 
+                        data: data.revenue.map(r => r / 100), 
+                        borderColor: '#3b82f6', 
+                        backgroundColor: 'transparent',
+                        borderWidth: 2, 
+                        tension: 0.3, 
+                        pointRadius: 0
+                    },
+                    { 
+                        label: 'New Signups', 
+                        data: data.member_growth, 
+                        borderColor: '#10b981', 
+                        backgroundColor: 'transparent',
+                        borderWidth: 2, 
+                        tension: 0.3,
+                        pointRadius: 0 
+                    }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
                 plugins: { legend: { display: false } },
                 scales: {
-                    x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } },
-                    y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748b', font: { size: 10 } } }
+                    x: { grid: { display: false, drawBorder: false } },
+                    y: { grid: { color: '#27272a', borderDash: [4, 4], drawBorder: false }, beginAtZero: true }
                 }
             }
-        });
-    }
-
-    function animateCounters() {
-        const counters = [
-            { id: 'stat-members', prefix: '', suffix: '' },
-            { id: 'stat-trainers', prefix: '', suffix: '' },
-            { id: 'stat-revenue', prefix: '', suffix: '' },
-            { id: 'stat-attendance', prefix: '', suffix: '' }
-        ];
-
-        counters.forEach(counter => {
-            const el = document.getElementById(counter.id);
-            const target = parseFloat(el.getAttribute('data-target'));
-            if (isNaN(target)) return;
-
-            const duration = 1500;
-            const startTime = performance.now();
-
-            function update(currentTime) {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const currentVal = (progress * target);
-                
-                if (counter.id === 'stat-revenue') {
-                    el.innerText = currentVal.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
-                } else {
-                    el.innerText = Math.floor(currentVal);
-                }
-                if (progress < 1) requestAnimationFrame(update);
-            }
-            requestAnimationFrame(update);
         });
     }
 

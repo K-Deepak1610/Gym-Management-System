@@ -22,6 +22,8 @@ CREATE TABLE IF NOT EXISTS members (
     expiry_date DATE,
     trainer_id INTEGER,
     status TEXT DEFAULT 'Active',
+    risk_score INTEGER DEFAULT 0,
+    goal TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (trainer_id) REFERENCES trainers(id) ON DELETE SET NULL
 );
@@ -72,6 +74,25 @@ CREATE TABLE IF NOT EXISTS activity_log (
     action TEXT NOT NULL,
     admin_name TEXT DEFAULT 'Admin',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 8. Subscription Plans
+CREATE TABLE IF NOT EXISTS subscription_plans (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    duration_days INTEGER NOT NULL,
+    price REAL NOT NULL,
+    features TEXT
+);
+
+-- 9. Member Metrics
+CREATE TABLE IF NOT EXISTS member_metrics (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    member_id INTEGER,
+    weight REAL,
+    body_fat_percentage REAL,
+    recorded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (member_id) REFERENCES members(id) ON DELETE CASCADE
 );
 
 -- Seed Sample Equipment if empty

@@ -1,74 +1,92 @@
 {% extends "base.html" %}
 
-{% block header_title %}Financial Ledger{% endblock %}
+{% block header_title %}Financial Ledger & Revenue{% endblock %}
 
 {% block content %}
-<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-    <div class="card-titan p-10 border-t-4 border-emerald-400 relative overflow-hidden">
-        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Total Fee Collected</h3>
-        <p class="text-4xl font-black text-white tracking-tighter">₹{{ "{:,.2f}".format(paid_total) }}</p>
-        <div class="absolute -right-4 -bottom-4 text-emerald-400/5 text-7xl"><i class="fas fa-check-double"></i></div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="card-premium p-6 md:p-8 relative overflow-hidden border-t-4 border-emerald-500">
+        <h3 class="text-xs font-medium text-zinc-400 uppercase tracking-widest mb-1.5">Collected Revenue</h3>
+        <p class="text-3xl font-black text-white tracking-tight">₹{{ "{:,.2f}".format(paid_total) }}</p>
+        <div class="absolute -right-4 -bottom-4 text-emerald-500/10 text-7xl pointer-events-none"><i class="fas fa-money-check-alt"></i></div>
     </div>
-    <div class="card-titan p-10 border-t-4 border-orange-400 relative overflow-hidden">
-        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Awaiting Payments</h3>
-        <p class="text-4xl font-black text-white tracking-tighter">₹{{ "{:,.2f}".format(pending_total) }}</p>
-        <div class="absolute -right-4 -bottom-4 text-orange-400/5 text-7xl"><i class="fas fa-hourglass-half"></i></div>
+    
+    <div class="card-premium p-6 md:p-8 relative overflow-hidden border-t-4 border-amber-500">
+        <h3 class="text-xs font-medium text-zinc-400 uppercase tracking-widest mb-1.5">Pending Receivables</h3>
+        <p class="text-3xl font-black text-white tracking-tight">₹{{ "{:,.2f}".format(pending_total) }}</p>
+        <div class="absolute -right-4 -bottom-4 text-amber-500/10 text-7xl pointer-events-none"><i class="fas fa-file-invoice"></i></div>
     </div>
+    
     <div class="flex items-center justify-center">
-        <button onclick="toggleModal('paymentModal')" class="btn-titan w-full py-10 rounded-[32px] flex items-center justify-center gap-4 text-sm">
-            <i class="fas fa-plus-circle text-xl"></i>
-            NEW TRANSACTION
+        <button onclick="document.getElementById('paymentModal').classList.remove('hidden')" class="w-full h-full min-h-[120px] rounded-xl border-2 border-dashed border-zinc-700 hover:border-brand-500 hover:bg-brand-500/5 text-zinc-400 hover:text-brand-400 transition-colors flex flex-col items-center justify-center gap-2 group">
+            <i class="fas fa-plus-circle text-2xl group-hover:scale-110 transition-transform"></i>
+            <span class="text-xs font-bold uppercase tracking-widest">Post Transaction</span>
         </button>
     </div>
 </div>
 
-<div class="card-titan p-10">
-    <div class="flex justify-between items-center mb-10">
-        <h3 class="text-2xl font-black text-white uppercase tracking-tighter">Recent Revenue Activity</h3>
-        <div class="flex gap-4">
-            <input type="text" id="paymentSearch" onkeyup="filterPayments()" placeholder="Search athletes or identifiers..." class="bg-white/5 border border-white/5 rounded-xl px-6 py-3 text-xs outline-none focus:border-emerald-400/30 transition-all text-slate-300 w-64">
+<div class="card-premium overflow-hidden">
+    <div class="p-6 md:p-8 border-b border-zinc-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h2 class="text-lg font-semibold text-white">Transaction History</h2>
+            <p class="text-xs text-zinc-500 mt-1">Chronological log of all financial receipts and invoices.</p>
+        </div>
+        <div class="relative w-full sm:w-64">
+            <i class="fas fa-search absolute left-3 top-2.5 text-zinc-500 text-sm"></i>
+            <input type="text" id="paymentSearch" onkeyup="filterPayments()" placeholder="Search transactions..." 
+                   class="w-full pl-9 pr-4 py-2 bg-zinc-950 border border-zinc-800 rounded-lg outline-none focus:border-brand-500/50 transition-all text-sm text-white">
         </div>
     </div>
+    
     <div class="overflow-x-auto">
         <table class="w-full text-left" id="paymentsTable">
             <thead>
-                <tr class="text-[10px] font-black uppercase text-slate-600 tracking-[0.2em] border-b border-white/5">
-                    <th class="pb-6 px-4">Date & Time</th>
-                    <th class="pb-6 px-4">Athlete Record</th>
-                    <th class="pb-6 px-4">Settlement Amount</th>
-                    <th class="pb-6 px-4">Status</th>
-                    <th class="pb-6 px-4">Annotation</th>
-                    <th class="pb-6 px-4 text-right">Identifier</th>
+                <tr class="bg-zinc-900/50 border-b border-zinc-800 text-[10px] font-medium text-zinc-400 uppercase tracking-widest">
+                    <th class="px-6 py-4">Timeline</th>
+                    <th class="px-6 py-4">Entity</th>
+                    <th class="px-6 py-4">Settlement</th>
+                    <th class="px-6 py-4">Status</th>
+                    <th class="px-6 py-4">Ledger Ref.</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-white/5">
+            <tbody class="divide-y divide-zinc-800/50 text-sm">
                 {% for payment in payments %}
-                <tr class="table-row-hover group">
-                    <td class="py-6 px-4">
-                        <p class="text-xs font-bold text-white">{{ payment.payment_date.strftime('%d %b, %Y') }}</p>
-                        <p class="text-[10px] text-slate-500 font-medium">{{ payment.payment_date.strftime('%H:%M %p') }}</p>
-                    </td>
-                    <td class="py-6 px-4">
-                        <p class="text-sm font-black text-white member-name">{{ payment.member_name }}</p>
-                        <p class="text-[10px] font-bold text-emerald-400/60 uppercase tracking-widest payment-id">MTW-{{ "%03d" % payment.member_id }}</p>
-                    </td>
-                    <td class="py-6 px-4">
-                        <p class="text-sm font-black text-white">₹{{ "{:,.2f}".format(payment.amount) }}</p>
-                        <p class="text-[10px] font-bold text-slate-600 uppercase">{{ payment.payment_method }}</p>
-                    </td>
-                    <td class="py-6 px-4">
-                        {% if payment.status == 'Paid' %}
-                        <span class="badge-premium badge-active">PAID</span>
-                        {% else %}
-                        <span class="badge-premium badge-soon">PENDING</span>
+                <tr class="group hover:bg-zinc-800/20 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <p class="text-sm font-medium text-zinc-200">{{ payment.payment_date | formatdate }}</p>
+                        {% if payment.payment_date and ' ' in payment.payment_date %}
+                            <p class="text-[10px] text-zinc-500 font-mono mt-0.5">{{ payment.payment_date.split(' ')[1] }}</p>
                         {% endif %}
                     </td>
-                    <td class="py-6 px-4">
-                        <p class="text-xs text-slate-400 max-w-[200px] truncate italic">{{ payment.notes or '-' }}</p>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded bg-zinc-800 border border-zinc-700 flex items-center justify-center font-bold text-xs text-white uppercase shrink-0">
+                                {{ payment.member_name[:2] }}
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-white member-name">{{ payment.member_name }}</p>
+                                <p class="text-[10px] text-zinc-500 font-mono mt-0.5 payment-id">TF-{{ "%04d" % payment.member_id }}</p>
+                            </div>
+                        </div>
                     </td>
-                    <td class="py-6 px-4 text-right">
-                        <span class="text-[10px] font-mono font-bold text-slate-700 identifier">#LEDG-{{ payment.id }}</span>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <p class="text-sm font-semibold text-white tracking-tight">₹{{ "{:,.2f}".format(payment.amount) }}</p>
+                        <p class="text-[10px] text-zinc-500 uppercase tracking-widest mt-0.5">{{ payment.payment_method }}</p>
                     </td>
+                    <td class="px-6 py-4">
+                        {% if payment.status == 'Paid' %}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold tracking-widest uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> PAID</span>
+                        {% else %}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold tracking-widest uppercase bg-amber-500/10 text-amber-400 border border-amber-500/20"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> PENDING</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4">
+                        <p class="text-[10px] font-mono text-zinc-600 font-semibold identifier mb-1">#INV-{{ "%06d" % payment.id }}</p>
+                        <p class="text-xs text-zinc-400 max-w-[200px] truncate" title="{{ payment.notes }}">{{ payment.notes or '-' }}</p>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="px-6 py-12 text-center text-zinc-500 text-sm">No payment records found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -76,64 +94,48 @@
     </div>
 </div>
 
-<!-- Log Payment Modal -->
-<div id="paymentModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-    <div class="card-titan w-full max-w-lg p-10 animate-slide border border-white/10">
-        <div class="flex justify-between items-center mb-10">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl bg-emerald-400/10 flex items-center justify-center text-emerald-400">
-                    <i class="fas fa-file-invoice-dollar text-xl"></i>
-                </div>
-                <h3 class="text-2xl font-black text-white uppercase tracking-tighter">New Transaction</h3>
-            </div>
-            <button onclick="toggleModal('paymentModal')" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-500 hover:text-white transition-all"><i class="fas fa-times"></i></button>
-        </div>
-        <form action="/add_payment" method="POST" class="space-y-6">
+<!-- New Transaction Modal -->
+<div id="paymentModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl w-full max-w-lg p-6 md:p-8 shadow-2xl relative">
+        <button onclick="document.getElementById('paymentModal').classList.add('hidden')" class="absolute top-6 right-6 text-zinc-500 hover:text-white"><i class="fas fa-times"></i></button>
+        <h2 class="text-xl font-semibold text-white mb-6">Authorize Invoice</h2>
+        <form action="/add_payment" method="POST" class="space-y-4">
             <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Select Athlete</label>
-                <div class="relative">
-                    <select name="member_id" required class="w-full bg-slate-900/50 border border-white/5 rounded-2xl px-5 py-4 outline-none focus:border-emerald-400/40 transition-all text-sm appearance-none text-white">
-                        <option value="" disabled selected>Choose a member...</option>
-                        {% for m in members %}
-                        <option value="{{ m.id }}">{{ m.name }}</option>
-                        {% endfor %}
+                <label class="block text-xs font-medium text-zinc-400 mb-1.5">Debtor / Client</label>
+                <select name="member_id" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-brand-500/50 outline-none">
+                    <option value="" disabled selected>-- Select Member --</option>
+                    {% for m in members %}
+                    <option value="{{ m.id }}">{{ m.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-zinc-400 mb-1.5">Settlement Amount (₹)</label>
+                    <input type="number" step="0.01" name="amount" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-lg font-mono font-semibold text-emerald-400 focus:border-brand-500/50 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-zinc-400 mb-1.5">Payment Status</label>
+                    <select name="status" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm font-medium text-white focus:border-brand-500/50 outline-none">
+                        <option value="Paid">PAID CONFIRMED</option>
+                        <option value="Pending">PENDING INVOICE</option>
                     </select>
-                    <i class="fas fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-slate-600 pointer-events-none text-xs"></i>
-                </div>
-            </div>
-            <div class="grid grid-cols-2 gap-6">
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Amount (₹)</label>
-                    <div class="relative">
-                        <span class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-xs">₹</span>
-                        <input type="number" step="0.01" name="amount" required class="w-full bg-slate-900/50 border border-white/5 rounded-2xl pl-10 pr-5 py-4 outline-none focus:border-emerald-400/40 transition-all text-sm font-black text-white">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Settlement Status</label>
-                    <div class="relative">
-                        <select name="status" class="w-full bg-slate-900/50 border border-white/5 rounded-2xl px-5 py-4 outline-none focus:border-emerald-400/40 transition-all text-sm appearance-none font-bold text-white">
-                            <option value="Paid">PAID</option>
-                            <option value="Pending">PENDING</option>
-                        </select>
-                        <i class="fas fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-slate-600 pointer-events-none text-xs"></i>
-                    </div>
                 </div>
             </div>
             <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Transaction Notes</label>
-                <textarea name="notes" rows="3" class="w-full bg-slate-900/50 border border-white/5 rounded-2xl px-5 py-4 outline-none focus:border-emerald-400/40 transition-all text-sm text-slate-300 resize-none" placeholder="e.g. Monthly membership fee, personal training session..."></textarea>
+                <label class="block text-xs font-medium text-zinc-400 mb-1.5">Transaction Remarks</label>
+                <textarea name="notes" rows="3" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-300 focus:border-brand-500/50 outline-none resize-none" placeholder="e.g. Quarterly fees mapping"></textarea>
             </div>
-            <button type="submit" class="w-full btn-titan py-5 mt-4 font-black uppercase tracking-[0.2em] text-xs">Authorize Transaction</button>
+            <div class="pt-4">
+                <button type="submit" class="btn-primary w-full justify-center">Commit Transaction to Ledger</button>
+            </div>
         </form>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
-    function toggleModal(id) {
-        document.getElementById(id).classList.toggle('hidden');
-    }
-
     function filterPayments() {
         const input = document.getElementById('paymentSearch');
         const filter = input.value.toUpperCase();
@@ -141,16 +143,22 @@
         const tr = table.getElementsByTagName('tr');
 
         for (let i = 1; i < tr.length; i++) {
-            const name = tr[i].querySelector('.member-name').textContent || "";
-            const id = tr[i].querySelector('.payment-id').textContent || "";
-            const identifier = tr[i].querySelector('.identifier').textContent || "";
+            const nameCell = tr[i].querySelector('.member-name');
+            const idCell = tr[i].querySelector('.payment-id');
+            const invCell = tr[i].querySelector('.identifier');
             
-            if (name.toUpperCase().indexOf(filter) > -1 || 
-                id.toUpperCase().indexOf(filter) > -1 || 
-                identifier.toUpperCase().indexOf(filter) > -1) {
-                tr[i].style.display = "";
-            } else {
-                tr[i].style.display = "none";
+            if (nameCell || idCell || invCell) {
+                const name = nameCell ? nameCell.textContent : "";
+                const id = idCell ? idCell.textContent : "";
+                const inv = invCell ? invCell.textContent : "";
+                
+                if (name.toUpperCase().indexOf(filter) > -1 || 
+                    id.toUpperCase().indexOf(filter) > -1 || 
+                    inv.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
             }
         }
     }

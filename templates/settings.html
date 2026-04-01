@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block header_title %}System Settings{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    
+    <div class="mb-10 border-b border-zinc-800 pb-4">
+        <h2 class="text-lg font-medium text-white mb-1">Your Profile</h2>
+        <p class="text-sm text-zinc-500">Manage your personal settings and authentication details.</p>
+    </div>
+
+    <div class="card-premium p-6 md:p-8 mb-8">
+        <div class="flex items-center gap-6 mb-8">
+            <div class="w-20 h-20 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-2xl font-bold text-white relative">
+                {{ user.username[:2].upper() }}
+                <div class="absolute bottom-0 right-0 w-5 h-5 bg-emerald-500 border-2 border-zinc-900 rounded-full"></div>
+            </div>
+            <div>
+                <h3 class="text-xl font-semibold text-white">{{ user.username }}</h3>
+                <p class="text-sm text-brand-400 font-medium capitalize mt-1">{{ user.role }} Account</p>
+            </div>
+        </div>
+
+        <form action="{{ url_for('settings_bp.settings') }}" method="POST" class="max-w-md space-y-5">
+            <input type="hidden" name="action" value="update_profile">
+            <div>
+                <label class="block text-xs font-medium text-zinc-400 mb-2">Email Address</label>
+                <input type="email" name="email" value="{{ user.email or '' }}" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 outline-none focus:border-brand-500/50 transition-all text-sm text-white">
+            </div>
+            <button type="submit" class="btn-primary">Update Profile</button>
+        </form>
+    </div>
+
+    <div class="mb-10 border-b border-zinc-800 pb-4 mt-12">
+        <h2 class="text-lg font-medium text-white mb-1">Security</h2>
+        <p class="text-sm text-zinc-500">Update your password and secure your account.</p>
+    </div>
+
+    <div class="card-premium p-6 md:p-8 mb-8">
+        <form action="{{ url_for('settings_bp.settings') }}" method="POST" class="max-w-md space-y-5">
+            <input type="hidden" name="action" value="change_password">
+            <div>
+                <label class="block text-xs font-medium text-zinc-400 mb-2">Current Password</label>
+                <input type="password" name="old_password" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 outline-none focus:border-brand-500/50 transition-all text-sm text-white">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-zinc-400 mb-2">New Password</label>
+                <input type="password" name="new_password" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 outline-none focus:border-brand-500/50 transition-all text-sm text-white">
+            </div>
+            <button type="submit" class="btn-primary bg-zinc-800 text-white hover:bg-zinc-700">Secure Account</button>
+        </form>
+    </div>
+    
+    <div class="mb-10 border-b border-zinc-800 pb-4 mt-12">
+        <h2 class="text-lg font-medium text-white mb-1">Preferences</h2>
+        <p class="text-sm text-zinc-500">Local browser settings for the AuraFit UI.</p>
+    </div>
+    
+    <div class="card-premium p-6 md:p-8 flex items-center justify-between">
+        <div>
+            <h3 class="text-sm font-medium text-white mb-1">Light Mode</h3>
+            <p class="text-xs text-zinc-500">Switch between dark (default) and light themes.</p>
+        </div>
+        <button id="themeToggle" class="relative inline-flex h-6 w-11 items-center rounded-full bg-brand-600 transition-colors focus:outline-none">
+            <span class="translate-x-6 inline-block h-4 w-4 transform rounded-full bg-white transition-transform" id="themeTarget"></span>
+        </button>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const themeToggle = document.getElementById('themeToggle');
+    const themeTarget = document.getElementById('themeTarget');
+    
+    // In a real app with Tailwind dark mode we would toggle .dark class on HTML
+    // For this exact template setup with fixed dark classes, we show a premium toast
+    themeToggle.addEventListener('click', () => {
+        const isLight = themeToggle.classList.contains('bg-zinc-700');
+        if(isLight) {
+            themeToggle.classList.replace('bg-zinc-700', 'bg-brand-600');
+            themeTarget.classList.replace('translate-x-1', 'translate-x-6');
+            showToast("Dark mode activated", "success");
+        } else {
+            themeToggle.classList.replace('bg-brand-600', 'bg-zinc-700');
+            themeTarget.classList.replace('translate-x-6', 'translate-x-1');
+            showToast("Light mode is only available in Enterprise tier", "error");
+            
+            // Revert after 2 seconds
+            setTimeout(() => {
+                themeToggle.classList.replace('bg-zinc-700', 'bg-brand-600');
+                themeTarget.classList.replace('translate-x-1', 'translate-x-6');
+            }, 2000);
+        }
+    });
+</script>
+{% endblock %}
